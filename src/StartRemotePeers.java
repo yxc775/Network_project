@@ -16,19 +16,20 @@ public class StartRemotePeers {
 	public void getConfiguration()
 	{
 		String st;
-		int i1;
 		peerInfoVector = new Vector<RemotePeerInfo>();
 		try {
 			BufferedReader in = new BufferedReader(new FileReader("PeerInfo.cfg"));
 			while((st = in.readLine()) != null) {
 				 String[] tokens = st.split("\\s+");
+				 if(tokens[0].getBytes().length > 4){
+				 	throw new IOException("processID cannot be more than 4 bytes");
+				 }
 			     peerInfoVector.addElement(new RemotePeerInfo(tokens[0], tokens[1], tokens[2]));
 			}
-
 			in.close();
 		}
 		catch (Exception ex) {
-			System.out.println(ex.toString());
+			ex.printStackTrace();
 		}
 	}
 	
