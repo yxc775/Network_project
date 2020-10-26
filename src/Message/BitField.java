@@ -2,6 +2,7 @@ package Message;
 
 import Config.CommonAttributes;
 
+//this is the payload for message
 public class BitField extends Message {
     public Piece[] pieces;
     public BitField() {
