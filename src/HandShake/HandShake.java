@@ -22,10 +22,6 @@ public class HandShake {
          * PeerId Peer ID
          *
          */
-        public HandShake() {
-
-        }
-
         public HandShake(String Header, String PeerId) {
 
             try {
@@ -110,7 +106,6 @@ public class HandShake {
                     throw new Exception("Byte array length not matching.");
 
                 // VAR initialization
-                handshakeMessage = new HandShake();
                 msgHeader = new byte[18];
                 msgPeerID = new byte[4];
 
@@ -122,8 +117,7 @@ public class HandShake {
                         4);
 
                 // Populate handshakeMessage entity
-                handshakeMessage.setHeader(msgHeader);
-                handshakeMessage.setPeerID(msgPeerID);
+                handshakeMessage = new HandShake(msgHeader.toString(),msgPeerID.toString());
 
             } catch (Exception e) {
                 peerProcess.PringLog(e.toString());
