@@ -12,10 +12,8 @@ import java.util.Hashtable;
 //this is the main peerProcess
 public class peerProcess {
     public ServerSocket ListeningSocket = null; //this will used for listening socket
+    public RemotePeerInfo remotePeerInfo = null;
     public int PeerID;//this is current id
-    public static volatile Hashtable<String, RemotePeerInfo> AllRemotePeerInfo = new Hashtable<String,RemotePeerInfo>(); //stored all peer info
-    public static volatile Hashtable<String, RemotePeerInfo> PreferedPeer = new Hashtable<String,RemotePeerInfo>(); // this is the prefered peer, which is chocked
-    public static volatile Hashtable<String, RemotePeerInfo> unchockedPeer = new Hashtable<String, RemotePeerInfo>(); // this is the unprefered peer, which is unchocked
     public boolean isFinished = false; //if this peer finish download this variable will turned to true
 
     public peerProcess(String peerID){
@@ -41,7 +39,7 @@ public class peerProcess {
     }
 
     //this will call log generator to create loc based on input string
-    public static void PringLog(String message)
+    public static void PrintLog(String message)
     {
 
     }
