@@ -7,7 +7,10 @@ import Message.Message;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.rmi.Remote;
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 
 //this is the main peerProcess
 public class peerProcess {
@@ -27,9 +30,19 @@ public class peerProcess {
     }
 
     //this will call prefered peer to start transfer data
-    public static void StartPreferPeer()
+    public void StartPreferPeer()
     {
-
+        Iterator items = ProcessesManager.AllRemotePeerInfo.entrySet().iterator();
+        while(items.hasNext())
+        {
+            Map.Entry peerInfoPair = (Map.Entry)items.next();
+            String key = (String)peerInfoPair.getKey();
+            RemotePeerInfo val = (RemotePeerInfo)peerInfoPair.getValue();
+            if(!key.equals(this.PeerID))
+            {
+                ProcessesManager.PreferedPeer.put(key,val);
+            }
+        }
     }
 
     //this will call unprefered peer to start transfer data
@@ -64,7 +77,8 @@ public class peerProcess {
 
             CommonInfoConfig.readCommonInfo("Common.cfg");
             readPeerInfo();
-            //TODO:initialize prefered peers
+
+            process.StartPreferPeer();
 
             //assuming this peer does not have the file
             boolean hasFile = false;
