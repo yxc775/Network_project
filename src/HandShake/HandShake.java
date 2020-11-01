@@ -91,8 +91,6 @@ public class HandShake {
 
 
     //Convert byteMessage content to HandShake object
-
-    //Convert handshakeMessage to byte objects
     public byte[] encodeMessage() {
         byte[] sendMessage = new byte[HANDSHAKE_FULLLENGTH];
         //Copy header byte
