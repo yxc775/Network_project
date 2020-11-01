@@ -9,7 +9,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 //this will be running as a thread, for receive data from other process
-public class RemoteHandler {
+public class RemoteHandler implements Runnable{
     private boolean isSender;
     private Socket socket;
     private InputStream input;
@@ -27,6 +27,10 @@ public class RemoteHandler {
         catch (IOException e){
             e.printStackTrace();
         }
+    }
+
+    public void run(){
+
     }
 
 }
