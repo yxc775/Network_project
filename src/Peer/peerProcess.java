@@ -19,18 +19,18 @@ public class peerProcess implements Runnable{
     public int PeerID;//this is current id
     public boolean isFinished = false; //if this peer finish download this variable will turned to true
 
-<<<<<<< Updated upstream
+
     public peerProcess(String peerID){
         this.PeerID = Integer.parseInt(peerID);
     }
-=======
+
     //this will goes over the current data and decide what kind of message we will do next steps, which will using other functions
     public void run()
     {
 
     }
 
->>>>>>> Stashed changes
+
 
     //this will update all peerinfo from peerinfo.cfg to Hashtable, and unchocked peer
     public static void readPeerInfo()
@@ -78,10 +78,10 @@ public class peerProcess implements Runnable{
 
     }
 
-<<<<<<< Updated upstream
-    public static void main(String[] args){
+
+    public static void main(String[] args) {
         peerProcess process = new peerProcess(args[0]);
-        try{
+        try {
             //start logging message communication between peers
             Logger.start("log_peer_" + process.PeerID + ".log");
 
@@ -92,11 +92,11 @@ public class peerProcess implements Runnable{
 
             //assuming this peer does not have the file
             boolean hasFile = false;
-        }
-        catch (Exception e){
+        } catch (Exception e) {
 
         }
-=======
+    }
+
     //this will return the peer ID
     public int GetProcessID()
     {
@@ -143,6 +143,6 @@ public class peerProcess implements Runnable{
     private void SendPiece()
     {
 
->>>>>>> Stashed changes
+
     }
 }
