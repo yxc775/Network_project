@@ -12,16 +12,25 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 
-//this is the main peerProcess
-public class peerProcess {
+//this is the main peerProcess, take role as sender. send message to other process
+public class peerProcess implements Runnable{
     public ServerSocket ListeningSocket = null; //this will used for listening socket
     public RemotePeerInfo remotePeerInfo = null;
     public int PeerID;//this is current id
     public boolean isFinished = false; //if this peer finish download this variable will turned to true
 
+<<<<<<< Updated upstream
     public peerProcess(String peerID){
         this.PeerID = Integer.parseInt(peerID);
     }
+=======
+    //this will goes over the current data and decide what kind of message we will do next steps, which will using other functions
+    public void run()
+    {
+
+    }
+
+>>>>>>> Stashed changes
 
     //this will update all peerinfo from peerinfo.cfg to Hashtable, and unchocked peer
     public static void readPeerInfo()
@@ -69,6 +78,7 @@ public class peerProcess {
 
     }
 
+<<<<<<< Updated upstream
     public static void main(String[] args){
         peerProcess process = new peerProcess(args[0]);
         try{
@@ -86,5 +96,53 @@ public class peerProcess {
         catch (Exception e){
 
         }
+=======
+    //this will return the peer ID
+    public int GetProcessID()
+    {
+        return PeerID;
+    }
+
+
+    //various function we will use for sending data
+    private void SendChoke()
+    {
+
+    }
+
+    private void SendUnchoke()
+    {
+
+    }
+
+    private void SendInterested()
+    {
+
+    }
+
+    private void SendUnInterested()
+    {
+
+    }
+
+    private void SendHave()
+    {
+
+    }
+
+    private void SendBitfield()
+    {
+
+    }
+
+    private void SendRequest()
+    {
+
+    }
+
+    private void SendPiece()
+    {
+
+>>>>>>> Stashed changes
     }
 }
