@@ -1,5 +1,6 @@
 package Peer;
 
+//this is the infomation for different peer, other peer using this to connect with other peer
 public class RemotePeerInfo implements Comparable<RemotePeerInfo>{
 	public double downloadSpeed = 0;
 	public String peerId;

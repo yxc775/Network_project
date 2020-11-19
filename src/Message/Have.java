@@ -1,11 +1,11 @@
 package Message;
-
+import Util.Util;
 
 public class Have extends Message {
     public int pieceIndex;
     public static int INT_BYTE_SIZE = 4;
-    public Have(int messagePayload) {
+    public Have(byte[] messagePayload) {
         super((byte) 4,INT_BYTE_SIZE + 1);
-        pieceIndex = messagePayload;
+        pieceIndex = Util.convertByteToInt(messagePayload);
     }
 }
