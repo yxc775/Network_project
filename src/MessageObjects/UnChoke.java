@@ -1,4 +1,4 @@
-package Message;
+package MessageObjects;
 
 public class UnChoke extends Message {
     public UnChoke() {

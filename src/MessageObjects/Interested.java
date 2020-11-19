@@ -1,4 +1,4 @@
-package Message;
+package MessageObjects;
 
 public class Interested extends Message {
     public Interested() {

@@ -1,4 +1,4 @@
-package Message;
+package MessageObjects;
 
 public class Choke extends Message {
     public Choke(byte[] messageLen) {

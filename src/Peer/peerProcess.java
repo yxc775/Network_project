@@ -1,14 +1,13 @@
 package Peer;
 
 import Config.CommonInfoConfig;
+import FileManager.BitFieldObject;
 import Logger.Logger;
-import Message.Message;
+import MessageObjects.Message;
 
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.rmi.Remote;
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -16,12 +15,11 @@ import java.util.Map;
 public class peerProcess implements Runnable{
     public ServerSocket ListeningSocket = null; //this will used for listening socket
     public RemotePeerInfo remotePeerInfo = null;
-    public int PeerID;//this is current id
-    public boolean isFinished = false; //if this peer finish download this variable will turned to true
+    public BitFieldObject owned = null;
+    public int PeerID;
 
-
-    public peerProcess(String peerID){
-        this.PeerID = Integer.parseInt(peerID);
+    public peerProcess(RemotePeerInfo peerInfo){
+        this.remotePeerInfo = peerInfo;
     }
 
     //this will goes over the current data and decide what kind of message we will do next steps, which will using other functions
@@ -33,9 +31,10 @@ public class peerProcess implements Runnable{
 
 
     //this will update all peerinfo from peerinfo.cfg to Hashtable, and unchocked peer
-    public static void readPeerInfo()
+    public static RemotePeerInfo readPeerInfo(String processID)
     {
-
+        //todo search the corresponding peerInfo to start the process
+        return new RemotePeerInfo(1,"",1);
     }
 
     //this will call prefered peer to start transfer data
@@ -80,18 +79,28 @@ public class peerProcess implements Runnable{
 
 
     public static void main(String[] args) {
-        peerProcess process = new peerProcess(args[0]);
+        RemotePeerInfo info = readPeerInfo(args[0]);
+        peerProcess process = new peerProcess(info);
+        boolean isFirst = false;
         try {
             //start logging message communication between peers
             Logger.start("log_peer_" + process.PeerID + ".log");
 
             CommonInfoConfig.readCommonInfo("Common.cfg");
-            readPeerInfo();
 
             process.StartPreferPeer();
 
-            //assuming this peer does not have the file
-            boolean hasFile = false;
+            ProcessesManager.AllRemotePeerInfo.put(String.valueOf(process.remotePeerInfo.peerId)
+                    ,process.remotePeerInfo);
+            if(ProcessesManager.AllRemotePeerInfo.size() == 1){
+                isFirst = true;
+            }
+
+            //initialize the Bit field
+            process.owned = new BitFieldObject();
+            process.owned.checkOwndedBitField(String.valueOf(process.PeerID),isFirst);
+
+
         } catch (Exception e) {
 
         }

@@ -1,4 +1,4 @@
-package Message;
+package MessageObjects;
 
 public class NotInterested extends Message {
     public NotInterested() {

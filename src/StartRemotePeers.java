@@ -26,7 +26,7 @@ public class StartRemotePeers {
 				 if(tokens[0].getBytes().length > 4){
 				 	throw new IOException("processID cannot be more than 4 bytes");
 				 }
-			     peerInfoVector.addElement(new RemotePeerInfo(tokens[0], tokens[1], tokens[2]));
+			     peerInfoVector.addElement(new RemotePeerInfo(Integer.parseInt(tokens[0]), tokens[1], Integer.parseInt(tokens[2])));
 			}
 			in.close();
 		}

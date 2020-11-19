@@ -3,18 +3,19 @@ package Peer;
 //this is the infomation for different peer, other peer using this to connect with other peer
 public class RemotePeerInfo implements Comparable<RemotePeerInfo>{
 	public double downloadSpeed = 0;
-	public String peerId;
+	public int peerId;
 	public String peerAddress;
-	public String peerPort;
+	public int port;
 	public boolean hasFile = false;
+	public int index; //0 represents first peer
 
-	public RemotePeerInfo(String pId, String pAddress, String pPort) {
+	public RemotePeerInfo(int pId, String pAddress, int pPort) {
 		peerId = pId;
 		peerAddress = pAddress;
-		peerPort = pPort;
+		port = pPort;
 	}
 
-	public String getPeerId(){
+	public int getPeerId(){
 		return peerId;
 	}
 
@@ -22,8 +23,8 @@ public class RemotePeerInfo implements Comparable<RemotePeerInfo>{
 		return peerAddress;
 	}
 
-	public String getPeerPort(){
-		return peerPort;
+	public int getPort(){
+		return port;
 	}
 
 	public boolean hasFile(){

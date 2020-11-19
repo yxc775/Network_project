@@ -1,8 +1,6 @@
-package Message;
+package MessageObjects;
 
 import Config.CommonAttributes;
-
-import java.nio.charset.StandardCharsets;
 
 //this is the payload for message
 public class BitField extends Message {

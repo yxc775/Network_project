@@ -1,4 +1,4 @@
-package Message;
+package MessageObjects;
 import Util.Util;
 
 public class Have extends Message {
