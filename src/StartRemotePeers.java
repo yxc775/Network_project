@@ -1,6 +1,7 @@
 import Peer.RemotePeerInfo;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /*
@@ -12,6 +13,7 @@ import java.util.*;
 public class StartRemotePeers {
 
 	public Vector<RemotePeerInfo> peerInfoVector;
+	public Vector<Process> peerProcesses;
 	
 	public void getConfiguration()
 	{
@@ -32,29 +34,67 @@ public class StartRemotePeers {
 			ex.printStackTrace();
 		}
 	}
+	/**
+	 * Checks if all processes has finished
+	 */
+	public synchronized  boolean allDone(){
+		boolean isfinished = true;
+		try {
+			for(Process x: peerProcesses){
+				System.out.println("process " + x.pid() + " in state: " + x.waitFor());
+				if(x.waitFor() == 0){
+					System.out.println("process " + x.pid() + "execute properly");
+				}
+				else if(x.waitFor() == 255){
+					InputStream error = x.getErrorStream();
+					String s = new String(error.readAllBytes(), StandardCharsets.UTF_8);
+					System.out.println("SSH fail, " + s);
+					isfinished = false;
+					break;
+				}
+				else {
+					isfinished = false;
+					System.out.println("Unknown error");
+					break;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return isfinished;
+	}
 	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		boolean shouldStop = false;
+		boolean isCheckingstop = true;
 		try {
-			StartRemotePeers myStart = new StartRemotePeers();
-			myStart.getConfiguration();
+			StartRemotePeers start = new StartRemotePeers();
+			start.getConfiguration();
 					
 			// get current path
 			String path = System.getProperty("user.dir");
 			
 			// start clients at remote hosts
-			for (int i = 0; i < myStart.peerInfoVector.size(); i++) {
-				RemotePeerInfo pInfo = (RemotePeerInfo) myStart.peerInfoVector.elementAt(i);
-				
+			for (int i = 0; i < start.peerInfoVector.size(); i++) {
+				RemotePeerInfo pInfo = (RemotePeerInfo) start.peerInfoVector.elementAt(i);
 				System.out.println("Start remote peer " + pInfo.peerId +  " at " + pInfo.peerAddress );
-				Runtime.getRuntime().exec("ssh " + pInfo.peerAddress + " cd " + path + "; java peerProcess " + pInfo.peerId);
+				String command = "ssh " + pInfo.peerAddress + " cd " + path + "; java peerProcess " + pInfo.peerId;
+				start.peerProcesses.add(Runtime.getRuntime().exec(command));
+				System.out.println(command);
+			}
 
-			}		
-			System.out.println("Starting all remote peers has done." );
-
+			System.out.println("Waiting for remote peers to terminate.." );
+			boolean isdone = start.allDone();
+			while(!isdone){
+				Thread.sleep(5000);
+				isdone = start.allDone();
+			}
+			System.out.println("All processes finished");
 		}
 		catch (Exception ex) {
 			System.out.println(ex);
