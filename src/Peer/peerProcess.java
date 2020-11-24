@@ -13,135 +13,119 @@ import java.net.SocketTimeoutException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Vector;
 
 //this is the main peerProcess, take role as sender. send message to other process
-public class peerProcess implements Runnable{
+public class peerProcess implements Runnable {
     public ServerSocket listeningSocket = null; //this will used for listening socket
     public Thread listeningThread = null;
-    public RemotePeerInfo remotePeerInfo = null;
+    public RemotePeerInfo remotePeerInfo;
     public BitFieldObject owned = null;
 
-    public peerProcess(RemotePeerInfo peerInfo){
+    public peerProcess(RemotePeerInfo peerInfo) {
         this.remotePeerInfo = peerInfo;
     }
 
     //this will goes over the current data and decide what kind of message we will do next steps, which will using other functions
-    public void run()
-    {
+    public void run() {
 
     }
-
 
 
     //this will update all peerinfo from peerinfo.cfg to Hashtable, and unchocked peer
-    public static RemotePeerInfo readPeerInfo(String processID)
-    {
+    public static RemotePeerInfo readPeerInfo(String processID) {
         //todo search the corresponding peerInfo to start the process
-        return new RemotePeerInfo(1,"",1,1);
+        return new RemotePeerInfo(1, "", 1, 1);
     }
 
     //this will call prefered peer to start transfer data
-    public void createPreferPeer()
-    {
+    public void createPreferPeer() {
         Iterator items = ProcessesManager.AllRemotePeerInfo.entrySet().iterator();
-        while(items.hasNext())
-        {
-            Map.Entry peerInfoPair = (Map.Entry)items.next();
-            String key = (String)peerInfoPair.getKey();
-            RemotePeerInfo val = (RemotePeerInfo)peerInfoPair.getValue();
-            if(!key.equals(this.remotePeerInfo.peerId))
-            {
-                ProcessesManager.PreferedPeer.put(key,val);
+        while (items.hasNext()) {
+            Map.Entry peerInfoPair = (Map.Entry) items.next();
+            String key = (String) peerInfoPair.getKey();
+            RemotePeerInfo val = (RemotePeerInfo) peerInfoPair.getValue();
+            if (!key.equals(this.remotePeerInfo.peerId)) {
+                ProcessesManager.PreferedPeer.put(key, val);
             }
         }
     }
 
     //initlize listening Thread for this process
-    public void startListeningThread(){
-        try{
+    public void startListeningThread() {
+        try {
             this.listeningSocket = new ServerSocket(this.remotePeerInfo.port);
 
             //start listening thread
             this.listeningThread = new Thread(new ProcessListener(this.listeningSocket, this.remotePeerInfo.peerId));
             this.listeningThread.start();
-        }
-        catch (SocketTimeoutException e){
+        } catch (SocketTimeoutException e) {
             e.printStackTrace();
             Logger.stop();
-        }
-        catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             Logger.stop();
         }
     }
 
     //this will call unprefered peer to start transfer data
-    public static void Unchock()
-    {
+    public static void Unchock() {
 
     }
 
     //this will call log generator to create loc based on input string
-    public static void PrintLog(String message)
-    {
+    public static void PrintLog(String message) {
 
     }
 
     //send message to socket
-    public void SendMessage(Socket socket, Message message)
-    {
+    public void SendMessage(Socket socket, Message message) {
 
     }
 
     //this will create empty file for download data
-    public void createEmptyFile(int peerID)
-    {
-        try{
+    public void createEmptyFile(int peerID) {
+        try {
             File dir = new File(String.valueOf(peerID));
             dir.mkdir();
             File created = new File(String.valueOf(peerID), CommonAttributes.filename);
             OutputStream os = new FileOutputStream(created, true);
             byte noneByte = 0;
-            for(int i = 0; i < CommonAttributes.filesize; i ++){
+            for (int i = 0; i < CommonAttributes.filesize; i++) {
                 os.write(noneByte);
             }
             os.close();
-        }
-        catch(FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             //todo may need to log this
             System.out.println("Empty File creation filed");
             e.printStackTrace();
-        }
-        catch(IOException e){
+        } catch (IOException e) {
             //todo may need to log this
-            System.out.println("OS initialization write in fail" );
+            System.out.println("OS initialization write in fail");
             e.printStackTrace();
         }
     }
 
 
     public static void main(String[] args) {
-        RemotePeerInfo mypeerInfo = readPeerInfo(args[0]);
-        peerProcess process = new peerProcess(mypeerInfo);
+        peerProcess process = new peerProcess(readPeerInfo(args[0]));
         boolean isFirst = false;
         try {
             //start logging message communication between peers
-            Logger.start("log_peer_" + process.remotePeerInfo.peerId + ".log");
+            Logger.start("log_peer_" + process.getProcessID() + ".log");
 
             CommonInfoConfig.readCommonInfo("Common.cfg");
 
             process.createPreferPeer();
 
-            ProcessesManager.AllRemotePeerInfo.put(String.valueOf(process.remotePeerInfo.peerId)
-                    ,process.remotePeerInfo);
-            if(ProcessesManager.AllRemotePeerInfo.size() == 1){
+            ProcessesManager.AllRemotePeerInfo.put(String.valueOf(process.getProcessID())
+                    , process.remotePeerInfo);
+            if (ProcessesManager.AllRemotePeerInfo.size() == 1) {
                 isFirst = true;
             }
 
             //initialize the Bit field
             process.owned = new BitFieldObject();
-            process.owned.checkOwndedBitField(String.valueOf(process.remotePeerInfo.peerId),isFirst);
+            process.owned.checkOwndedBitField(String.valueOf(process.getProcessID()), isFirst);
 
             ProcessesManager.messageManager = new Thread(new MessageManager());
             ProcessesManager.messageManager.start();
@@ -149,21 +133,20 @@ public class peerProcess implements Runnable{
             //If it is the first peer, first peer is assumed to have the whole file.
             //we have to assign a file to have the whole file at the very early stage,
             // otherwise BITTorrent in this context wont work.
-            if(isFirst){
+            if (isFirst) {
                 process.startListeningThread();
-            }
-            else{
-                process.createEmptyFile(mypeerInfo.peerId);
+            } else {
+                process.createEmptyFile(process.getProcessID());
 
                 Enumeration<String> e = ProcessesManager.AllRemotePeerInfo.keys();
-                while(e.hasMoreElements()){
+                while (e.hasMoreElements()) {
                     RemotePeerInfo peerInfo = ProcessesManager.AllRemotePeerInfo.get(e.nextElement());
-                    if(mypeerInfo.index > peerInfo.index){
+                    if (process.getProcessIndex() > peerInfo.index) {
                         //initilize remote handler which is handling sending message including handshake
-                        Thread temp = new Thread(new RemoteHandler(mypeerInfo.port,
-                                mypeerInfo.peerId,
+                        Thread temp = new Thread(new RemoteHandler(process.getPort(),
+                                process.getProcessID(),
                                 true,
-                                mypeerInfo.peerAddress));
+                                process.getAddress()));
                         ProcessesManager.receivingThread.add(temp);
                         temp.start();
                     }
@@ -176,40 +159,38 @@ public class peerProcess implements Runnable{
             ProcessesManager.startUnchokedPeersTimer();
 
             boolean checkAlldone = ProcessesManager.allDone();
-            while(!checkAlldone){
+            while (!checkAlldone) {
                 checkAlldone = ProcessesManager.allDone();
-                if(checkAlldone){
+                if (checkAlldone) {
                     //todo log the information that all related peers are done
                     ProcessesManager.stopPreferedPeersTimer();
                     ProcessesManager.stopUnchokePeersTimer();
-                    try{
+                    try {
                         //for every 10 seconds
                         Thread.currentThread();
                         Thread.sleep(1000);
-                    }
-                    catch(Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
 
-                    if(process.listeningThread.isAlive()){
+                    if (process.listeningThread.isAlive()) {
                         process.listeningThread.interrupt();
                     }
-                    if(ProcessesManager.messageManager.isAlive()){
+                    if (ProcessesManager.messageManager.isAlive()) {
                         ProcessesManager.messageManager.interrupt();
                     }
 
-                    for(Thread x: ProcessesManager.receivingThread){
-                        if(x.isAlive()){
+                    for (Thread x : ProcessesManager.receivingThread) {
+                        if (x.isAlive()) {
                             x.interrupt();
                         }
                     }
-                    for(Thread x: ProcessesManager.sendingThread){
-                        if(x.isAlive()){
+                    for (Thread x : ProcessesManager.sendingThread) {
+                        if (x.isAlive()) {
                             x.interrupt();
                         }
                     }
-                }
-                else{
+                } else {
                     try {
                         Thread.currentThread();
                         //Wait 60 seconds to check again
@@ -228,50 +209,52 @@ public class peerProcess implements Runnable{
     }
 
     //this will return the peer ID
-    public int GetProcessID()
-    {
+    public int getProcessID() {
         return remotePeerInfo.peerId;
     }
 
+    public int getProcessIndex() {
+        return remotePeerInfo.index;
+    }
+
+    public int getPort() {
+        return remotePeerInfo.port;
+    }
+
+    public String getAddress() {
+        return remotePeerInfo.peerAddress;
+    }
 
     //various function we will use for sending data
-    private void SendChoke()
-    {
+    private void SendChoke() {
 
     }
 
-    private void SendUnchoke()
-    {
+    private void SendUnchoke() {
 
     }
 
-    private void SendInterested()
-    {
+    private void SendInterested() {
 
     }
 
-    private void SendUnInterested()
-    {
+    private void SendUnInterested() {
 
     }
 
-    private void SendHave()
-    {
+    private void SendHave() {
 
     }
 
-    private void SendBitfield()
-    {
+    private void SendBitfield() {
 
     }
 
-    private void SendRequest()
-    {
+    private void SendRequest() {
 
     }
 
-    private void SendPiece()
-    {
+    private void SendPiece() {
 
 
     }
