@@ -1,8 +1,6 @@
 package Peer;
 
 
-import Logger.Logger;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,22 +9,16 @@ import java.net.Socket;
 //this will be running as a thread, for receive data from other process
 public class RemoteHandler implements Runnable{
     private boolean isSender;
-    private Socket socket;
-    private InputStream input;
-    private OutputStream output;
-    private String curPeerid;
+    private int port;
+    private String address;
+    private int curPeerid;
     //
-    public RemoteHandler(Socket socket, boolean isSender, String curPeerID){
-        this.socket = socket;
+    public RemoteHandler(int portnum,int curPeerID, boolean isSender, String address){
+        this.port = portnum;
         this.isSender = isSender;
+        this.address = address;
         this.curPeerid = curPeerID;
-        try{
-            input = socket.getInputStream();
-            output = socket.getOutputStream();
-        }
-        catch (IOException e){
-            e.printStackTrace();
-        }
+
     }
 
     public void run(){

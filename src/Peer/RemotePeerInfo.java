@@ -9,10 +9,11 @@ public class RemotePeerInfo implements Comparable<RemotePeerInfo>{
 	public boolean hasFile = false;
 	public int index; //0 represents first peer
 
-	public RemotePeerInfo(int pId, String pAddress, int pPort) {
-		peerId = pId;
-		peerAddress = pAddress;
-		port = pPort;
+	public RemotePeerInfo(int pId, String pAddress, int pPort, int index) {
+		this.peerId = pId;
+		this.peerAddress = pAddress;
+		this.port = pPort;
+		this.index = index;
 	}
 
 	public int getPeerId(){
