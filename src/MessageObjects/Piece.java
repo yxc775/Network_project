@@ -1,6 +1,6 @@
 package MessageObjects;
 
-import Util.Util;
+import Utility.Util;
 
 public class Piece extends Message {
     private byte[] byteIndex;

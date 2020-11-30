@@ -2,7 +2,8 @@ package Peer;
 
 
 import Config.CommonAttributes;
-import Util.PeerSpeedComparator;
+import Utility.PeerSpeedComparator;
+import Utility.Util;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -13,9 +14,10 @@ import java.util.*;
 
 //this class will run as a thread, to keep sending data out
 public class PreferedPeer extends TimerTask {
-    public int curpeerID;
-    public PreferedPeer(int peerId){
-        curpeerID = peerId;
+    private int curpeerID;
+    private peerProcess curProcess;
+    public PreferedPeer(peerProcess curprocess){
+        curpeerID = curprocess.remotePeerInfo.peerId;
     }
     @Override
     public void run() {
@@ -88,9 +90,8 @@ public class PreferedPeer extends TimerTask {
                 }
             }
         }
-        //todo need to log this line after the prefered candidates are selected
         if(prelist != ""){
-            System.out.println(curpeerID + " has selected the prefered neighbors - " + prelist);
+            Util.PrintLog(curpeerID + " has selected the prefered neighbors - " + prelist);
         }
     }
 

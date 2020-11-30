@@ -1,5 +1,5 @@
 package MessageObjects;
-import Util.Util;
+import Utility.Util;
 
 public class Have extends Message {
     public int pieceIndex;

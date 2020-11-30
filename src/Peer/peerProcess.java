@@ -5,6 +5,7 @@ import Config.CommonInfoConfig;
 import FileManager.BitFieldObject;
 import Logger.Logger;
 import MessageObjects.Message;
+import Utility.Util;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -95,11 +96,6 @@ public class peerProcess implements Runnable {
 
     }
 
-    //this will call log generator to create loc based on input string
-    public static void PrintLog(String message) {
-
-    }
-
     //send message to socket
     public void SendMessage(Socket socket, Message message) {
 
@@ -119,18 +115,18 @@ public class peerProcess implements Runnable {
             os.close();
         } catch (FileNotFoundException e) {
             //todo may need to log this
-            System.out.println("Empty File creation filed");
+            Util.PrintLog("Empty File creation filed");
             e.printStackTrace();
         } catch (IOException e) {
             //todo may need to log this
-            System.out.println("OS initialization write in fail");
+            Util.PrintLog("OS initialization write in fail");
             e.printStackTrace();
         }
     }
 
     public void startPreferedPeersTimer(){
         preferedPeerTimer = new Timer();
-        preferedPeerTimer.schedule(new PreferedPeer(remotePeerInfo.peerId),
+        preferedPeerTimer.schedule(new PreferedPeer(this),
                 CommonAttributes.unChokeInterval * 1000,
                 CommonAttributes.unChokeInterval * 1000
         );
@@ -251,8 +247,7 @@ public class peerProcess implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        //Todo need to log that this peer is finished
+        Util.PrintLog("Peer Process " + process.remotePeerInfo.getPeerId() + " is finished and exiting... ");
         Logger.stop();
     }
 

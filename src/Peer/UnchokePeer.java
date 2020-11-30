@@ -1,5 +1,7 @@
 package Peer;
 
+import Utility.Util;
+
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.TimerTask;
@@ -52,7 +54,7 @@ public class UnchokePeer extends TimerTask {
             RemotePeerInfo peer = temp.firstElement();
 
             //todo printlog is not finished yet
-            peerProcess.PrintLog(peerID + " has the optimistically unchoked neighbor " + peer.peerId);
+            Util.PrintLog(peerID + " has the optimistically unchoked neighbor " + peer.peerId);
 
             if( ProcessesManager.AllRemotePeerInfo.get(peer.peerId).isChoked )
             {

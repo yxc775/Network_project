@@ -1,5 +1,7 @@
 package Peer;
 
+import Utility.Util;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -30,12 +32,12 @@ public class ProcessListener implements  Runnable{
                 peerSocket = listeningSocket.accept();
                 sendingThread = new Thread(new RemoteHandler( peerSocket.getLocalPort(), peerID, false,
                         peerSocket.getLocalSocketAddress().toString()));
-                peerProcess.PrintLog(peerID + " : The connection is established");
+                Util.PrintLog(peerID + " : The connection is established");
                 ProcessesManager.sendingThread.add(sendingThread);
                 sendingThread.start();
 
             }catch(IOException e){
-                peerProcess.PrintLog(this.peerID + " Exception in connection: " + e.toString());
+                Util.PrintLog(this.peerID + " Exception in connection: " + e.toString());
             }
         }
 

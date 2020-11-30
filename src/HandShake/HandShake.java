@@ -2,8 +2,7 @@ package HandShake;
 
 import java.nio.charset.StandardCharsets;
 
-import Peer.peerProcess;
-import Util.Util;
+import Utility.Util;
 
 //这里是将原来的handshakemessage和messageconstants合并在一起写了
 public class HandShake {
@@ -23,7 +22,7 @@ public class HandShake {
             this.zeroBits = zerobits.getBytes(StandardCharsets.UTF_8);
             checkIntegrity();
         } catch (Exception e) {
-            peerProcess.PrintLog(e.toString());
+            Util.PrintLog(e.toString());
         }
     }
 
@@ -51,7 +50,7 @@ public class HandShake {
             this.peerID = peerID;
             checkIntegrity();
         } catch (Exception e) {
-            peerProcess.PrintLog(e.toString());
+            Util.PrintLog(e.toString());
         }
 
     }
@@ -66,7 +65,7 @@ public class HandShake {
             if (!(new String(this.zeroBits, StandardCharsets.UTF_8).equals(correctZerobits)))
                 throw new Exception("Zero bits mismatch.");
         } catch (Exception e) {
-            peerProcess.PrintLog(e.toString());
+            Util.PrintLog(e.toString());
         }
     }
 
