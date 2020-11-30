@@ -8,9 +8,12 @@ public class RemotePeerInfo implements Comparable<RemotePeerInfo>{
 	public int port;
 	public boolean hasFile = false;
 	public int index; //0 represents first peer
-	public Boolean isChoked = false;
+	public Boolean isChoked = true;
 	public Boolean isCompleted = false;
 	public Boolean isHandShaked = false;
+	public Boolean isInterested = true;
+	public Boolean isPrefered = false;
+	public int peerState = -1;
 
 
 	public RemotePeerInfo(int pId, String pAddress, int pPort, int index) {

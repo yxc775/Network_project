@@ -13,6 +13,7 @@ import java.net.SocketTimeoutException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Timer;
 
 //this is the main peerProcess, take role as sender. send message to other process
 public class peerProcess implements Runnable {
@@ -20,9 +21,10 @@ public class peerProcess implements Runnable {
     public Thread listeningThread = null;
     public RemotePeerInfo remotePeerInfo;
     public BitFieldObject owned = null;
+    public static volatile Timer preferedPeerTimer;
+    public static volatile Timer unchokedPeerTimer;
 
-    public peerProcess(RemotePeerInfo peerInfo) {
-        this.remotePeerInfo = peerInfo;
+    public peerProcess() {
     }
 
     //this will goes over the current data and decide what kind of message we will do next steps, which will using other functions
@@ -32,9 +34,30 @@ public class peerProcess implements Runnable {
 
 
     //this will update all peerinfo from peerinfo.cfg to Hashtable, and unchocked peer
-    public static RemotePeerInfo readPeerInfo(String processID) {
-        //todo search the corresponding peerInfo to start the process
-        return new RemotePeerInfo(1, "", 1, 1);
+    public void readPeerInfo() {
+        String line;
+        try{
+            BufferedReader input = new BufferedReader(new FileReader("PeerInfo.cfg"));
+            int linecount = 0;
+            line = input.readLine();
+            while(line != null){
+                String[] tokens = line.split("\\s+");
+                int peerId = Integer.valueOf(tokens[0]);
+                String address = tokens[1];
+                int portnum = Integer.valueOf(tokens[2]);
+
+                ProcessesManager.AllRemotePeerInfo.put(Integer.valueOf(tokens[0]),new RemotePeerInfo(peerId,address,portnum,linecount));
+                linecount++;
+            }
+            input.close();
+        }
+        catch(FileNotFoundException e){
+            //todo need to log this line
+            e.printStackTrace();
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
     }
 
     //this will call prefered peer to start transfer data
@@ -105,9 +128,33 @@ public class peerProcess implements Runnable {
         }
     }
 
+    public void startPreferedPeersTimer(){
+        preferedPeerTimer = new Timer();
+        preferedPeerTimer.schedule(new PreferedPeer(remotePeerInfo.peerId),
+                CommonAttributes.unChokeInterval * 1000,
+                CommonAttributes.unChokeInterval * 1000
+        );
+    }
+
+    public void startUnchokedPeersTimer(){
+        unchokedPeerTimer = new Timer();
+        unchokedPeerTimer.schedule(new UnchokePeer(),
+                CommonAttributes.optimisticUnchokeInterval* 1000,
+                CommonAttributes.optimisticUnchokeInterval * 1000
+        );
+    }
+
+    public void stopPreferedPeersTimer(){
+        preferedPeerTimer.cancel();
+    }
+
+    public void stopUnchokePeersTimer(){
+        unchokedPeerTimer.cancel();
+    }
+
 
     public static void main(String[] args) {
-        peerProcess process = new peerProcess(readPeerInfo(args[0]));
+        peerProcess process = new peerProcess();
         boolean isFirst = false;
         try {
             //start logging message communication between peers
@@ -115,11 +162,12 @@ public class peerProcess implements Runnable {
 
             CommonInfoConfig.readCommonInfo("Common.cfg");
 
+            process.readPeerInfo();
+            process.remotePeerInfo = ProcessesManager.AllRemotePeerInfo.get(args[0]);
+
             process.createPreferPeer();
 
-            ProcessesManager.AllRemotePeerInfo.put(process.getProcessID()
-                    , process.remotePeerInfo);
-            if (ProcessesManager.AllRemotePeerInfo.size() == 1) {
+            if(process.remotePeerInfo.index == 0){
                 isFirst = true;
             }
 
@@ -155,16 +203,16 @@ public class peerProcess implements Runnable {
                 //create listening thread
                 process.startListeningThread();
             }
-            ProcessesManager.startPreferedPeersTimer();
-            ProcessesManager.startUnchokedPeersTimer();
+            process.startPreferedPeersTimer();
+            process.startUnchokedPeersTimer();
 
             boolean checkAlldone = ProcessesManager.allDone();
             while (!checkAlldone) {
                 checkAlldone = ProcessesManager.allDone();
                 if (checkAlldone) {
                     //todo log the information that all related peers are done
-                    ProcessesManager.stopPreferedPeersTimer();
-                    ProcessesManager.stopUnchokePeersTimer();
+                    process.stopPreferedPeersTimer();
+                    process.stopUnchokePeersTimer();
                     try {
                         //for every 10 seconds
                         Thread.currentThread();

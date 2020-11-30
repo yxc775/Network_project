@@ -59,7 +59,7 @@ public class ProcessListener implements  Runnable{
     public void Initialize(int id, ServerSocket socket)
     {
         ProcessID = id;
-        ListeningSocket = socket;
+        listeningSocket = socket;
     }
 
 

@@ -4,6 +4,7 @@ import Config.CommonAttributes;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.net.Socket;
 import java.util.Hashtable;
 import java.util.Timer;
 import java.util.Vector;
@@ -14,35 +15,11 @@ public class ProcessesManager {
     public static volatile Hashtable<Integer, RemotePeerInfo> AllRemotePeerInfo = new Hashtable<Integer,RemotePeerInfo>(); //stored all peer info
     public static volatile Hashtable<Integer, RemotePeerInfo> PreferedPeer = new Hashtable<Integer,RemotePeerInfo>(); // this is the prefered peer, which is chocked
     public static volatile Hashtable<Integer, RemotePeerInfo> unchokedPeer = new Hashtable<Integer, RemotePeerInfo>(); // this is the unprefered peer, which is unchocked
-    public static volatile Timer preferedPeerTimer;
-    public static volatile Timer unchokedPeerTimer;
+    //despeerIdToSocket map store all the destination peer process id corresponding to each socket, so this process can send message to them
+    public static Hashtable<String, Socket> despeerIdToSocket = new Hashtable<String, Socket>();
     public static Vector<Thread> receivingThread = new Vector<Thread>();
     public static Vector<Thread> sendingThread = new Vector<Thread>();
     public static Thread messageManager;
-
-    public static void startPreferedPeersTimer(){
-        preferedPeerTimer = new Timer();
-        preferedPeerTimer.schedule(new PreferedPeer(),
-                CommonAttributes.unChokeInterval * 1000,
-                CommonAttributes.unChokeInterval * 1000
-                );
-    }
-
-    public static void startUnchokedPeersTimer(){
-        unchokedPeerTimer = new Timer();
-        unchokedPeerTimer.schedule(new UnchokePeer(),
-                CommonAttributes.optimisticUnchokeInterval* 1000,
-                CommonAttributes.optimisticUnchokeInterval * 1000
-        );
-    }
-
-    public static void stopPreferedPeersTimer(){
-        preferedPeerTimer.cancel();
-    }
-
-    public static void stopUnchokePeersTimer(){
-        unchokedPeerTimer.cancel();
-    }
 
     public static synchronized  boolean allDone(){
         String line;
