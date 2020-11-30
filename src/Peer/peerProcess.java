@@ -42,9 +42,9 @@ public class peerProcess implements Runnable {
         Iterator items = ProcessesManager.AllRemotePeerInfo.entrySet().iterator();
         while (items.hasNext()) {
             Map.Entry peerInfoPair = (Map.Entry) items.next();
-            String key = (String) peerInfoPair.getKey();
+            int key = (int) peerInfoPair.getKey();
             RemotePeerInfo val = (RemotePeerInfo) peerInfoPair.getValue();
-            if (!key.equals(this.remotePeerInfo.peerId)) {
+            if (key != this.remotePeerInfo.peerId) {
                 ProcessesManager.PreferedPeer.put(key, val);
             }
         }
@@ -117,7 +117,7 @@ public class peerProcess implements Runnable {
 
             process.createPreferPeer();
 
-            ProcessesManager.AllRemotePeerInfo.put(String.valueOf(process.getProcessID())
+            ProcessesManager.AllRemotePeerInfo.put(process.getProcessID()
                     , process.remotePeerInfo);
             if (ProcessesManager.AllRemotePeerInfo.size() == 1) {
                 isFirst = true;
@@ -138,7 +138,7 @@ public class peerProcess implements Runnable {
             } else {
                 process.createEmptyFile(process.getProcessID());
 
-                Enumeration<String> e = ProcessesManager.AllRemotePeerInfo.keys();
+                Enumeration<Integer> e = ProcessesManager.AllRemotePeerInfo.keys();
                 while (e.hasMoreElements()) {
                     RemotePeerInfo peerInfo = ProcessesManager.AllRemotePeerInfo.get(e.nextElement());
                     if (process.getProcessIndex() > peerInfo.index) {

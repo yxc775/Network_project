@@ -11,9 +11,9 @@ import java.util.Vector;
 
 //this is a process manager which can keep tracks of the state of multiple process to help logging and information sync
 public class ProcessesManager {
-    public static volatile Hashtable<String, RemotePeerInfo> AllRemotePeerInfo = new Hashtable<String,RemotePeerInfo>(); //stored all peer info
-    public static volatile Hashtable<String, RemotePeerInfo> PreferedPeer = new Hashtable<String,RemotePeerInfo>(); // this is the prefered peer, which is chocked
-    public static volatile Hashtable<String, RemotePeerInfo> unchokedPeer = new Hashtable<String, RemotePeerInfo>(); // this is the unprefered peer, which is unchocked
+    public static volatile Hashtable<Integer, RemotePeerInfo> AllRemotePeerInfo = new Hashtable<Integer,RemotePeerInfo>(); //stored all peer info
+    public static volatile Hashtable<Integer, RemotePeerInfo> PreferedPeer = new Hashtable<Integer,RemotePeerInfo>(); // this is the prefered peer, which is chocked
+    public static volatile Hashtable<Integer, RemotePeerInfo> unchokedPeer = new Hashtable<Integer, RemotePeerInfo>(); // this is the unprefered peer, which is unchocked
     public static volatile Timer preferedPeerTimer;
     public static volatile Timer unchokedPeerTimer;
     public static Vector<Thread> receivingThread = new Vector<Thread>();
