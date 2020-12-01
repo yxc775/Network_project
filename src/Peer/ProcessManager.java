@@ -6,12 +6,11 @@ import MessageObjects.MessageWrapper;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.net.Socket;
-import java.util.Hashtable;
-import java.util.Timer;
-import java.util.Vector;
+import java.util.*;
 
 
-//this is a process manager which can keep tracks of the state of multiple process to help logging and information sync
+//this is a process manager which can keep tracks of the state of multiple process to help logging and information sync including message processing
+//from multiple senders
 public class ProcessManager {
     public static volatile Hashtable<Integer, RemotePeerInfo> AllRemotePeerInfo = new Hashtable<Integer,RemotePeerInfo>(); //stored all peer info
     public static volatile Hashtable<Integer, RemotePeerInfo> PreferedPeer = new Hashtable<Integer,RemotePeerInfo>(); // this is the prefered peer, which is chocked
@@ -20,6 +19,7 @@ public class ProcessManager {
     public static Hashtable<Integer, Socket> despeerIdToSocket = new Hashtable<Integer, Socket>();
     public static Vector<Thread> receivingThread = new Vector<Thread>();
     public static Vector<Thread> sendingThread = new Vector<Thread>();
+    public static volatile Queue<MessageWrapper> messageQ = new LinkedList<MessageWrapper>();
     public static Thread messageManager;
 
     public static synchronized  boolean allDone(){
@@ -44,7 +44,7 @@ public class ProcessManager {
     }
 
     public static synchronized void addToMsgQueue(MessageWrapper msg){
-
+        messageQ.add(msg);
     }
 
 }
