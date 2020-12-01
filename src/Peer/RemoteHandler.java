@@ -67,7 +67,7 @@ public class RemoteHandler implements Runnable{
     }
     public void run(){
         byte[] handshakeBuffer = new byte[32];
-        byte[] nonPayloadMessage = new byte[MESSAGE_LENTH_BYTE + MESSAGE_TYPE_BYTE];
+        byte[] messageHeader = new byte[MESSAGE_LENTH_BYTE + MESSAGE_TYPE_BYTE];
         try{
             if(this.isSender){
                 if(!sendHandShake()){
@@ -121,15 +121,15 @@ public class RemoteHandler implements Runnable{
             while(waitingForContinuousFollowedMessage)
             {
 
-                int readStatusCode = input.read(nonPayloadMessage);
+                int readStatusCode = input.read(messageHeader);
 
                 if(readStatusCode == -1)
                     break;
 
                 byte[] messageLength = new byte[4];
                 byte[] messageType = new byte[1];
-                System.arraycopy(nonPayloadMessage, 0, messageLength, 0, messageLength.length);
-                System.arraycopy(nonPayloadMessage, messageLength.length, messageType, 0, messageType.length);
+                System.arraycopy(messageHeader, 0, messageLength, 0, messageLength.length);
+                System.arraycopy(messageHeader, messageLength.length, messageType, 0, messageType.length);
                 int type = Util.convertByteToInt(messageType);
                 if(hasPayLoad(type)){
                     int bytesRead = 0;
