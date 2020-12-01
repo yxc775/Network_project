@@ -1,6 +1,7 @@
 package Peer;
 
 import Config.CommonAttributes;
+import MessageObjects.MessageWrapper;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -11,12 +12,12 @@ import java.util.Vector;
 
 
 //this is a process manager which can keep tracks of the state of multiple process to help logging and information sync
-public class ProcessesManager {
+public class ProcessManager {
     public static volatile Hashtable<Integer, RemotePeerInfo> AllRemotePeerInfo = new Hashtable<Integer,RemotePeerInfo>(); //stored all peer info
     public static volatile Hashtable<Integer, RemotePeerInfo> PreferedPeer = new Hashtable<Integer,RemotePeerInfo>(); // this is the prefered peer, which is chocked
     public static volatile Hashtable<Integer, RemotePeerInfo> unchokedPeer = new Hashtable<Integer, RemotePeerInfo>(); // this is the unprefered peer, which is unchocked
     //despeerIdToSocket map store all the destination peer process id corresponding to each socket, so this process can send message to them
-    public static Hashtable<String, Socket> despeerIdToSocket = new Hashtable<String, Socket>();
+    public static Hashtable<Integer, Socket> despeerIdToSocket = new Hashtable<Integer, Socket>();
     public static Vector<Thread> receivingThread = new Vector<Thread>();
     public static Vector<Thread> sendingThread = new Vector<Thread>();
     public static Thread messageManager;
@@ -40,6 +41,10 @@ public class ProcessesManager {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public static synchronized void addToMsgQueue(MessageWrapper msg){
+
     }
 
 }

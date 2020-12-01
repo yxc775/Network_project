@@ -1,9 +1,32 @@
 package MessageObjects;
 
-public class Choke extends Message {
-    public Choke(byte[] messageLen) {
-        super((byte) 0,1);
-        super.hasPayload = false;
+import Utility.Util;
+
+public class Choke implements Message {
+    byte[] messageLength;
+    byte messagetype;
+    public Choke() {
+        this.messagetype = (byte)0;
+        this.messageLength = Util.convertInttoFourByte(1);
     }
 
+    @Override
+    public byte[] getMessageLength() {
+        return messageLength;
+    }
+
+    @Override
+    public byte getMessageType() {
+        return messagetype;
+    }
+
+    @Override
+    public byte[] getPayload() {
+        return null;
+    }
+
+    @Override
+    public boolean hasPayload() {
+        return false;
+    }
 }

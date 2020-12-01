@@ -2,7 +2,7 @@ package Peer;
 
 import Config.CommonAttributes;
 import Config.CommonInfoConfig;
-import FileManager.BitFieldObject;
+import FileManager.FilePiecesManager;
 import Logger.Logger;
 import MessageObjects.Message;
 import Utility.Util;
@@ -21,7 +21,7 @@ public class peerProcess implements Runnable {
     public ServerSocket listeningSocket = null; //this will used for listening socket
     public Thread listeningThread = null;
     public RemotePeerInfo remotePeerInfo;
-    public BitFieldObject owned = null;
+    public FilePiecesManager owned = null;
     public static volatile Timer preferedPeerTimer;
     public static volatile Timer unchokedPeerTimer;
 
@@ -47,7 +47,7 @@ public class peerProcess implements Runnable {
                 String address = tokens[1];
                 int portnum = Integer.valueOf(tokens[2]);
 
-                ProcessesManager.AllRemotePeerInfo.put(Integer.valueOf(tokens[0]),new RemotePeerInfo(peerId,address,portnum,linecount));
+                ProcessManager.AllRemotePeerInfo.put(Integer.valueOf(tokens[0]),new RemotePeerInfo(peerId,address,portnum,linecount));
                 linecount++;
             }
             input.close();
@@ -63,13 +63,13 @@ public class peerProcess implements Runnable {
 
     //this will call prefered peer to start transfer data
     public void createPreferPeer() {
-        Iterator items = ProcessesManager.AllRemotePeerInfo.entrySet().iterator();
+        Iterator items = ProcessManager.AllRemotePeerInfo.entrySet().iterator();
         while (items.hasNext()) {
             Map.Entry peerInfoPair = (Map.Entry) items.next();
             int key = (int) peerInfoPair.getKey();
             RemotePeerInfo val = (RemotePeerInfo) peerInfoPair.getValue();
             if (key != this.remotePeerInfo.peerId) {
-                ProcessesManager.PreferedPeer.put(key, val);
+                ProcessManager.PreferedPeer.put(key, val);
             }
         }
     }
@@ -80,7 +80,7 @@ public class peerProcess implements Runnable {
             this.listeningSocket = new ServerSocket(this.remotePeerInfo.port);
 
             //start listening thread
-            this.listeningThread = new Thread(new ProcessListener(this.listeningSocket, this.remotePeerInfo.peerId));
+            this.listeningThread = new Thread(new ProcessListener(this, this.listeningSocket, this.remotePeerInfo.peerId));
             this.listeningThread.start();
         } catch (SocketTimeoutException e) {
             e.printStackTrace();
@@ -159,7 +159,7 @@ public class peerProcess implements Runnable {
             CommonInfoConfig.readCommonInfo("Common.cfg");
 
             process.readPeerInfo();
-            process.remotePeerInfo = ProcessesManager.AllRemotePeerInfo.get(args[0]);
+            process.remotePeerInfo = ProcessManager.AllRemotePeerInfo.get(args[0]);
 
             process.createPreferPeer();
 
@@ -168,11 +168,11 @@ public class peerProcess implements Runnable {
             }
 
             //initialize the Bit field
-            process.owned = new BitFieldObject();
+            process.owned = new FilePiecesManager();
             process.owned.checkOwndedBitField(String.valueOf(process.getProcessID()), isFirst);
 
-            ProcessesManager.messageManager = new Thread(new MessageManager());
-            ProcessesManager.messageManager.start();
+            ProcessManager.messageManager = new Thread(new MessageManager());
+            ProcessManager.messageManager.start();
 
             //If it is the first peer, first peer is assumed to have the whole file.
             //we have to assign a file to have the whole file at the very early stage,
@@ -182,16 +182,16 @@ public class peerProcess implements Runnable {
             } else {
                 process.createEmptyFile(process.getProcessID());
 
-                Enumeration<Integer> e = ProcessesManager.AllRemotePeerInfo.keys();
+                Enumeration<Integer> e = ProcessManager.AllRemotePeerInfo.keys();
                 while (e.hasMoreElements()) {
-                    RemotePeerInfo peerInfo = ProcessesManager.AllRemotePeerInfo.get(e.nextElement());
+                    RemotePeerInfo peerInfo = ProcessManager.AllRemotePeerInfo.get(e.nextElement());
                     if (process.getProcessIndex() > peerInfo.index) {
                         //initilize remote handler which is handling sending message including handshake
-                        Thread temp = new Thread(new RemoteHandler(process.getPort(),
+                        Thread temp = new Thread(new RemoteHandler(process,process.getPort(),
                                 process.getProcessID(),
                                 true,
                                 process.getAddress()));
-                        ProcessesManager.receivingThread.add(temp);
+                        ProcessManager.receivingThread.add(temp);
                         temp.start();
                     }
                 }
@@ -202,9 +202,9 @@ public class peerProcess implements Runnable {
             process.startPreferedPeersTimer();
             process.startUnchokedPeersTimer();
 
-            boolean checkAlldone = ProcessesManager.allDone();
+            boolean checkAlldone = ProcessManager.allDone();
             while (!checkAlldone) {
-                checkAlldone = ProcessesManager.allDone();
+                checkAlldone = ProcessManager.allDone();
                 if (checkAlldone) {
                     //todo log the information that all related peers are done
                     process.stopPreferedPeersTimer();
@@ -220,16 +220,16 @@ public class peerProcess implements Runnable {
                     if (process.listeningThread.isAlive()) {
                         process.listeningThread.interrupt();
                     }
-                    if (ProcessesManager.messageManager.isAlive()) {
-                        ProcessesManager.messageManager.interrupt();
+                    if (ProcessManager.messageManager.isAlive()) {
+                        ProcessManager.messageManager.interrupt();
                     }
 
-                    for (Thread x : ProcessesManager.receivingThread) {
+                    for (Thread x : ProcessManager.receivingThread) {
                         if (x.isAlive()) {
                             x.interrupt();
                         }
                     }
-                    for (Thread x : ProcessesManager.sendingThread) {
+                    for (Thread x : ProcessManager.sendingThread) {
                         if (x.isAlive()) {
                             x.interrupt();
                         }

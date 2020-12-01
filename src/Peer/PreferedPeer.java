@@ -23,18 +23,18 @@ public class PreferedPeer extends TimerTask {
     public void run() {
         reReadPeerInfo();
         String prelist = "";
-        Enumeration<Integer> keys = ProcessesManager.AllRemotePeerInfo.keys();
+        Enumeration<Integer> keys = ProcessManager.AllRemotePeerInfo.keys();
         int countNumOfInterest = 0;
         while(keys.hasMoreElements()){
             int key = keys.nextElement();
-            RemotePeerInfo candidate = ProcessesManager.AllRemotePeerInfo.get(key);
+            RemotePeerInfo candidate = ProcessManager.AllRemotePeerInfo.get(key);
             if(key != curpeerID){
                 if(!candidate.isCompleted && candidate.isHandShaked){
                     countNumOfInterest++;
                 }
                 else if(candidate.isCompleted){
                     try{
-                        ProcessesManager.PreferedPeer.remove(key);
+                        ProcessManager.PreferedPeer.remove(key);
                     }
                     catch(Exception e){
                         System.out.println("accessing PreferedPeer globalist fail");
@@ -46,10 +46,10 @@ public class PreferedPeer extends TimerTask {
 
         //Need to pick the best neighbors because this process is interested to more nodes more than the setting configuration
         if(countNumOfInterest > CommonAttributes.numberOfPreferedN){
-            if(!ProcessesManager.PreferedPeer.isEmpty()){
-                ProcessesManager.PreferedPeer.clear();
+            if(!ProcessManager.PreferedPeer.isEmpty()){
+                ProcessManager.PreferedPeer.clear();
             }
-            List<RemotePeerInfo> pickList = new ArrayList<>(ProcessesManager.AllRemotePeerInfo.values());
+            List<RemotePeerInfo> pickList = new ArrayList<>(ProcessManager.AllRemotePeerInfo.values());
             //todo need to finish Peer streaming speed Comparator
             Collections.sort(pickList, new PeerSpeedComparator());
             int count = 0;
@@ -57,16 +57,16 @@ public class PreferedPeer extends TimerTask {
                 if(count > CommonAttributes.numberOfPreferedN - 1){
                     break;
                 }
-                if(i.isHandShaked && i.peerId == curpeerID && ProcessesManager.AllRemotePeerInfo.get(i.peerId).isCompleted){
-                    ProcessesManager.AllRemotePeerInfo.get(i.peerId).isPrefered = true;
-                    ProcessesManager.PreferedPeer.put(i.peerId,ProcessesManager.AllRemotePeerInfo.get(i.peerId));
+                if(i.isHandShaked && i.peerId == curpeerID && ProcessManager.AllRemotePeerInfo.get(i.peerId).isCompleted){
+                    ProcessManager.AllRemotePeerInfo.get(i.peerId).isPrefered = true;
+                    ProcessManager.PreferedPeer.put(i.peerId, ProcessManager.AllRemotePeerInfo.get(i.peerId));
                     count++;
                     prelist = prelist + i.peerId + ", ";
                     if(i.isChoked){
-                        SendUnchoke(ProcessesManager.despeerIdToSocket.get(i.peerId),i.peerId);
-                        ProcessesManager.AllRemotePeerInfo.get(i.peerId).isChoked = false;
-                        SendHave(ProcessesManager.despeerIdToSocket.get(i.peerId),i.peerId);
-                        ProcessesManager.AllRemotePeerInfo.get(i.peerId).peerState = 3;
+                        SendUnchoke(ProcessManager.despeerIdToSocket.get(i.peerId),i.peerId);
+                        ProcessManager.AllRemotePeerInfo.get(i.peerId).isChoked = false;
+                        SendHave(ProcessManager.despeerIdToSocket.get(i.peerId),i.peerId);
+                        ProcessManager.AllRemotePeerInfo.get(i.peerId).peerState = 3;
                     }
                 }
             }
@@ -74,18 +74,18 @@ public class PreferedPeer extends TimerTask {
         else{
             while(keys.hasMoreElements()){
                 int key = keys.nextElement();
-                RemotePeerInfo candidate = ProcessesManager.AllRemotePeerInfo.get(key);
+                RemotePeerInfo candidate = ProcessManager.AllRemotePeerInfo.get(key);
                 if(key != curpeerID){
                     if(!candidate.isCompleted && candidate.isHandShaked){
                         prelist = prelist + key + ", ";
-                        ProcessesManager.PreferedPeer.put(key,ProcessesManager.AllRemotePeerInfo.get(key));
-                        ProcessesManager.AllRemotePeerInfo.get(key).isPrefered = true;
+                        ProcessManager.PreferedPeer.put(key, ProcessManager.AllRemotePeerInfo.get(key));
+                        ProcessManager.AllRemotePeerInfo.get(key).isPrefered = true;
                     }
                     if(candidate.isChoked){
-                        SendUnchoke(ProcessesManager.despeerIdToSocket.get(key),key);
-                        ProcessesManager.AllRemotePeerInfo.get(key).isChoked = false;
-                        SendHave(ProcessesManager.despeerIdToSocket.get(key),key);
-                        ProcessesManager.AllRemotePeerInfo.get(key).peerState = 3;
+                        SendUnchoke(ProcessManager.despeerIdToSocket.get(key),key);
+                        ProcessManager.AllRemotePeerInfo.get(key).isChoked = false;
+                        SendHave(ProcessManager.despeerIdToSocket.get(key),key);
+                        ProcessManager.AllRemotePeerInfo.get(key).peerState = 3;
                     }
                 }
             }
@@ -105,9 +105,9 @@ public class PreferedPeer extends TimerTask {
                 boolean isDownloaded = Integer.parseInt(items[3]) == 1;
                 int peerid = Integer.parseInt(items[0]);
                 if(isDownloaded){
-                    ProcessesManager.AllRemotePeerInfo.get(peerid).isCompleted = true;
-                    ProcessesManager.AllRemotePeerInfo.get(peerid).isInterested= false;
-                    ProcessesManager.AllRemotePeerInfo.get(peerid).isChoked = false;
+                    ProcessManager.AllRemotePeerInfo.get(peerid).isCompleted = true;
+                    ProcessManager.AllRemotePeerInfo.get(peerid).isInterested= false;
+                    ProcessManager.AllRemotePeerInfo.get(peerid).isChoked = false;
                 }
             }
             input.close();

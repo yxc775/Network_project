@@ -1,9 +1,32 @@
 package MessageObjects;
 
-public class UnChoke extends Message {
+import Utility.Util;
+
+public class UnChoke implements Message {
+    byte messageType;
+    byte[] messageLength;
     public UnChoke() {
-        super((byte) 1,1);
-        super.hasPayload = false;
+        this.messageType = (byte)1;
+        this.messageLength = Util.convertInttoFourByte(1);
     }
 
+    @Override
+    public byte[] getMessageLength() {
+        return messageLength;
+    }
+
+    @Override
+    public byte getMessageType() {
+        return messageType;
+    }
+
+    @Override
+    public byte[] getPayload() {
+        return null;
+    }
+
+    @Override
+    public boolean hasPayload() {
+        return false;
+    }
 }

@@ -11,6 +11,7 @@ import java.net.Socket;
 public class ProcessListener implements  Runnable{
     private int ProcessID; // this will be the origional process id
     private ServerSocket listeningSocket;// this will be the socket we used
+    private peerProcess curProcess;
     private Socket peerSocket;
     private int peerID;
     public Thread sendingThread;
@@ -19,7 +20,8 @@ public class ProcessListener implements  Runnable{
 
     }
 
-    public ProcessListener(ServerSocket ListeningSocket, int peerID){
+    public ProcessListener(peerProcess process,ServerSocket ListeningSocket, int peerID){
+        this.curProcess = process;
         this.listeningSocket = ListeningSocket;
         this.peerID = peerID;
     }
@@ -30,18 +32,16 @@ public class ProcessListener implements  Runnable{
         while(true){
             try {
                 peerSocket = listeningSocket.accept();
-                sendingThread = new Thread(new RemoteHandler( peerSocket.getLocalPort(), peerID, false,
+                sendingThread = new Thread(new RemoteHandler(curProcess, peerSocket.getLocalPort(), peerID, false,
                         peerSocket.getLocalSocketAddress().toString()));
                 Util.PrintLog(peerID + " : The connection is established");
-                ProcessesManager.sendingThread.add(sendingThread);
+                ProcessManager.sendingThread.add(sendingThread);
                 sendingThread.start();
 
             }catch(IOException e){
                 Util.PrintLog(this.peerID + " Exception in connection: " + e.toString());
             }
         }
-
-
     }
 
     public void closeSocket()

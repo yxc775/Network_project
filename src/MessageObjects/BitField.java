@@ -1,47 +1,51 @@
 package MessageObjects;
 
-import Config.CommonAttributes;
+import Utility.Util;
 
-//this is the payload for message
-public class BitField extends Message {
-    public Boolean[] piecesInfo;
-    public int BIT_COUNT = 8;
-    public int pieceNum;
-    public BitField(byte[] messagePayload) {
-        super((byte) 5,(int) Math.ceil(((double) CommonAttributes.filesize / (double) CommonAttributes.piecesize)) + 1);
-        super.hasPayload = true;
-        pieceNum = super.messageLen - 1;
-        this.piecesInfo = new Boolean[pieceNum];
+public class BitField implements Message {
+    byte[] payload;
+    byte[] messageLength;
+    byte messagetype;
 
-        for(int i = 0 ; i < messagePayload.length; i ++)
-        {
-            for(int j = BIT_COUNT - 1; j >= 0; j--){
-                int shift = 1 << j;
-                if(i * BIT_COUNT - (BIT_COUNT - i - 1) < pieceNum){
-                    //True indicates that piece this peer already have, false indicates that piece this peer does not have
-                    if((messagePayload[i] & shift) != 0){
-                        piecesInfo[i * BIT_COUNT + (BIT_COUNT - j - 1)] = true;
-                    }
-                    else{
-                        piecesInfo[i * BIT_COUNT + (BIT_COUNT - j - 1)] = false;
-                    }
-                }
-            }
-        }
 
-    }
-    public Boolean[] getPiecesInfo(){
-        return piecesInfo;
+    public BitField(byte[] payload){
+        this.messagetype = (byte)5;
+        this.messageLength = Util.convertInttoFourByte(1 + payload.length);
+        this.payload = payload;
     }
 
-    public byte[] encode(BitField bitfield){
-        //TODO:need to implement encode
-        return new byte[1];
+    //create a package which will be sent through socket
+    public byte[] encode(){
+        byte[] msg = new byte[messageLength.length + 1 + payload.length];
+        byte[] messageTypeWrapper = new byte[1];
+        messageTypeWrapper[0] = this.messagetype;
+
+        System.arraycopy(getMessageLength(), 0, msg, 0, getMessageLength().length);
+        System.arraycopy(messageTypeWrapper, 0, msg, getMessageLength().length, messageTypeWrapper.length);
+        System.arraycopy(getPayload(), 0, msg, getMessageLength().length + messageTypeWrapper.length, getPayload().length);
+
+        return msg;
     }
 
-    public String toString(){
-        return super.toString()
-                + ", Data - "
-                + this.piecesInfo.toString();
+    @Override
+    public byte[] getMessageLength() {
+        return messageLength;
     }
+
+    @Override
+    public byte getMessageType() {
+        return messagetype;
+    }
+
+    @Override
+    public byte[] getPayload() {
+        return payload;
+    }
+
+    @Override
+    public boolean hasPayload() {
+        return true;
+    }
+
+
 }

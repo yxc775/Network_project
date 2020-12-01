@@ -1,17 +1,21 @@
 package MessageObjects;
 
+import Config.CommonAttributes;
 import Utility.Util;
 
-public class Piece extends Message {
+public class Piece implements Message {
     private byte[] byteIndex;
     private byte[] filePart;
     public int INDEX_LENGTH = 4;
     public int index;
     public boolean haveit = false;
     public String ownder;
+    public byte messageType;
+    public byte[] messageLength;
+    public byte[] payload;
 
-    public Piece(int size){
-        filePart = new byte[size];
+    public Piece(){
+        filePart = new byte[CommonAttributes.piecesize];
         index = -1;
         haveit = false;
         ownder = null;
@@ -19,11 +23,33 @@ public class Piece extends Message {
 
     public Piece(byte[] messagePayload)
     {
-        super((byte) 7,1+messagePayload.length);
+        messageType = (byte)7;
+        messageLength = Util.convertInttoFourByte(1 + messagePayload.length);
+        payload = messagePayload;
         byteIndex = new byte[INDEX_LENGTH];
         System.arraycopy(messagePayload, 0, byteIndex, 0, INDEX_LENGTH);
         index = Util.convertByteToInt(byteIndex);
         filePart = new byte[messagePayload.length - INDEX_LENGTH];
         System.arraycopy(messagePayload, INDEX_LENGTH, filePart, 0, messagePayload.length-INDEX_LENGTH);
+    }
+
+    @Override
+    public byte[] getMessageLength() {
+        return messageLength;
+    }
+
+    @Override
+    public byte getMessageType() {
+        return messageType;
+    }
+
+    @Override
+    public byte[] getPayload() {
+        return payload;
+    }
+
+    @Override
+    public boolean hasPayload() {
+        return true;
     }
 }

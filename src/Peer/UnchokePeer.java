@@ -26,17 +26,17 @@ public class UnchokePeer extends TimerTask {
 
         //todo update unchokedpeer before this start
         //if unchoked peer is not empty we need clear it
-        if(ProcessesManager.unchokedPeer.size() > 0)
+        if(ProcessManager.unchokedPeer.size() > 0)
         {
-            ProcessesManager.unchokedPeer.clear();
+            ProcessManager.unchokedPeer.clear();
         }
-        Enumeration<Integer> keys = ProcessesManager.AllRemotePeerInfo.keys();
+        Enumeration<Integer> keys = ProcessManager.AllRemotePeerInfo.keys();
         Vector<RemotePeerInfo> temp = new Vector<RemotePeerInfo>(); //we create a temp vector for later sending usage
 
         while(keys.hasMoreElements())
         {
             int key = keys.nextElement();
-            RemotePeerInfo tempinfo = ProcessesManager.AllRemotePeerInfo.get(key);
+            RemotePeerInfo tempinfo = ProcessManager.AllRemotePeerInfo.get(key);
 
             //if our status is choked and not complete, then we add it to later sending
             if(tempinfo.isChoked && key != peerID && !tempinfo.isCompleted && tempinfo.isHandShaked)
@@ -56,9 +56,9 @@ public class UnchokePeer extends TimerTask {
             //todo printlog is not finished yet
             Util.PrintLog(peerID + " has the optimistically unchoked neighbor " + peer.peerId);
 
-            if( ProcessesManager.AllRemotePeerInfo.get(peer.peerId).isChoked )
+            if( ProcessManager.AllRemotePeerInfo.get(peer.peerId).isChoked )
             {
-                ProcessesManager.AllRemotePeerInfo.get(peer.peerId).isChoked = false;
+                ProcessManager.AllRemotePeerInfo.get(peer.peerId).isChoked = false;
                 //todo send unchoke
                 //todo send have
                 //todo discuss what state is

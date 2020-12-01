@@ -1,10 +1,32 @@
 package MessageObjects;
 
-public class NotInterested extends Message {
+import Utility.Util;
+
+public class NotInterested implements Message {
+    byte messageType;
+    byte[] messageLength;
     public NotInterested() {
-        super((byte) 3,1);
-        super.hasPayload = false;
+        this.messageType = (byte)3;
+        this.messageLength = Util.convertInttoFourByte(1);
     }
 
+    @Override
+    public byte[] getMessageLength() {
+        return messageLength;
+    }
 
+    @Override
+    public byte getMessageType() {
+        return messageType;
+    }
+
+    @Override
+    public byte[] getPayload() {
+        return null;
+    }
+
+    @Override
+    public boolean hasPayload() {
+        return false;
+    }
 }

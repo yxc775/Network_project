@@ -1,25 +1,26 @@
-package HandShake;
+package MessageObjects;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import Utility.Util;
 
 //这里是将原来的handshakemessage和messageconstants合并在一起写了
 public class HandShake {
-    private int PEERID_LENGTH = 4;
-    private int HANDSHAKE_FULLLENGTH = 32;
-    private static String correctHeader = "P2PFILESHARINGPROJ";
-    private static String correctZerobits = "0000000000";
+    private static final int PEERID_LENGTH = 4;
+    private static final int HANDSHAKE_FULLLENGTH = 32;
+    public static final String correctHeader = "P2PFILESHARINGPROJ";
+    public static final byte[] correctZerobits = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
-    private byte[] header;
-    private byte[] zeroBits;
-    private byte[] peerID;
+    private byte[] header = new byte[18];
+    private byte[] zeroBits = new byte[10];
+    private byte[] peerID = new byte[4];
 
-    public HandShake(String header, String zerobits, String peerId) {
+    public HandShake(String header,byte[] zeroBits,int peerId) {
         try {
             this.header = header.getBytes(StandardCharsets.UTF_8);
-            this.peerID = peerId.getBytes(StandardCharsets.UTF_8);
-            this.zeroBits = zerobits.getBytes(StandardCharsets.UTF_8);
+            this.peerID = Util.convertInttoFourByte(peerId);
+            this.zeroBits = zeroBits;
             checkIntegrity();
         } catch (Exception e) {
             Util.PrintLog(e.toString());
@@ -27,10 +28,10 @@ public class HandShake {
     }
 
     //decode byteMessage
-    public HandShake(byte[] receivedMessage) {
+    public static HandShake decodeMessage(byte[] receivedMessage) {
         HandShake handshakeMessage = null;
         byte[] header = new byte[correctHeader.length()];
-        byte[] zeroBits = new byte[correctZerobits.length()];
+        byte[] zeroBits = new byte[correctZerobits.length];
         byte[] peerID = new byte[PEERID_LENGTH];
         try {
             if (Util.convertByteToString(receivedMessage).length() != HANDSHAKE_FULLLENGTH) {
@@ -41,18 +42,17 @@ public class HandShake {
             System.arraycopy(receivedMessage, 0, header,
                     0, correctHeader.length());
             System.arraycopy(receivedMessage, correctHeader.length(),
-                    zeroBits, 0, correctZerobits.length());
-            System.arraycopy(receivedMessage, correctHeader.length() + correctZerobits.length(),
+                    zeroBits, 0, correctZerobits.length);
+            System.arraycopy(receivedMessage, correctHeader.length() + correctZerobits.length,
                     peerID,
                     0, PEERID_LENGTH);
-            this.header = header;
-            this.zeroBits = zeroBits;
-            this.peerID = peerID;
-            checkIntegrity();
+
+            handshakeMessage = new HandShake(Util.convertByteToString(header),zeroBits,Util.convertByteToInt(peerID));
+            return handshakeMessage;
         } catch (Exception e) {
             Util.PrintLog(e.toString());
+            return null;
         }
-
     }
 
     //Check integrity of the handshake message
@@ -62,10 +62,10 @@ public class HandShake {
                 throw new Exception("Header mismatch.");
             if (this.peerID.length > PEERID_LENGTH)
                 throw new Exception("Peer ID is too long.");
-            if (!(new String(this.zeroBits, StandardCharsets.UTF_8).equals(correctZerobits)))
+            if (!Arrays.equals(this.zeroBits, correctZerobits))
                 throw new Exception("Zero bits mismatch.");
         } catch (Exception e) {
-            Util.PrintLog(e.toString());
+            Util.PrintLog("Handshake datagram mismatch, integrity checking fail " + e.toString());
         }
     }
 
