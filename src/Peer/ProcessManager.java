@@ -45,5 +45,16 @@ public class ProcessManager {
     public static synchronized void addToMessageQueuelist(MessageWrapper msg){
         messageQueue.add(msg);
     }
+    public static synchronized MessageWrapper removeFromMsgQueue()
+    {
+        if(!messageQueue.isEmpty())
+        {
+            return messageQueue.remove();
+        }
+        else{
+            System.out.println("Empty message queue! all message read");
+            return null;
+        }
+    }
 
 }
