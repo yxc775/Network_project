@@ -1,6 +1,5 @@
 package Peer;
 
-import Config.CommonAttributes;
 import MessageObjects.MessageWrapper;
 
 import java.io.BufferedReader;
@@ -19,7 +18,7 @@ public class ProcessManager {
     public static Hashtable<Integer, Socket> despeerIdToSocket = new Hashtable<Integer, Socket>();
     public static Vector<Thread> receivingThread = new Vector<Thread>();
     public static Vector<Thread> sendingThread = new Vector<Thread>();
-    public static volatile Queue<MessageWrapper> messageQ = new LinkedList<MessageWrapper>();
+    public static volatile Queue<MessageWrapper> messageQueue = new LinkedList<MessageWrapper>();
     public static Thread messageManager;
 
     public static synchronized  boolean allDone(){
@@ -43,8 +42,8 @@ public class ProcessManager {
         }
     }
 
-    public static synchronized void addToMsgQueue(MessageWrapper msg){
-        messageQ.add(msg);
+    public static synchronized void addToMessageQueuelist(MessageWrapper msg){
+        messageQueue.add(msg);
     }
 
 }

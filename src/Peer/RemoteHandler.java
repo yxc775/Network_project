@@ -143,10 +143,10 @@ public class RemoteHandler implements Runnable{
                         bytesRead += readStatus;
                     }
 
-                    ProcessManager.addToMsgQueue(new MessageWrapper(type,dataPayload,this.desPeerid));
+                    ProcessManager.addToMessageQueuelist(new MessageWrapper(type,dataPayload,this.desPeerid));
                 }
                 else{
-                    ProcessManager.addToMsgQueue(new MessageWrapper(type,null,this.desPeerid));
+                    ProcessManager.addToMessageQueuelist(new MessageWrapper(type,null,this.desPeerid));
                 }
             }
         }
