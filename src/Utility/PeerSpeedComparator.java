@@ -18,7 +18,7 @@ public class PeerSpeedComparator implements Comparator<RemotePeerInfo> {
            if (Double.toString(rm1.downloadSpeed).equals(Double.toString(rm2.downloadSpeed))){
                return 0;
            }
-           return rm1.downloadSpeed > rm2.downloadSpeed ? 1 : -1 ;
+           return rm1.downloadSpeed > rm2.downloadSpeed ? -1 : 1 ;
         }
     }
 }
