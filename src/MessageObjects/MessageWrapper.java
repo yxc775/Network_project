@@ -13,13 +13,60 @@ public class MessageWrapper {
     public final static int REQUEST_TYPE = 6;
     public final static int PIECE_TYPE = 7;
 
+    public static final int DATA_MSG_LEN = 4;
+    public static final int DATA_MSG_TYPE = 1;
+    public static byte[] payload;
     public int fromSenderPeer;
-    public int type;
-    public MessageWrapper(int messageType, byte[] payload,int fromSenderPeer){
+    public static Integer type;
+    public MessageWrapper(int messageType, byte[] payload, int fromSenderPeer){
         this.type = messageType;
+        this.payload = payload;
         this.messageClassObject = wrapToClassObject(messageType,payload);
         this.fromSenderPeer = fromSenderPeer;
     }
+
+
+    public static byte[] encode(MessageWrapper msg)
+    {
+        byte[] msgStream = null;
+        try
+        {
+            if (msg.messageClassObject.getMessageLength().length > DATA_MSG_LEN)
+                throw new Exception("Invalid message length.");
+            else if (type < 0 || type > 7)
+                throw new Exception("Invalid message type.");
+            else if (type == null)
+                throw new Exception("Invalid message type.");
+            else if (msg.messageClassObject.getMessageLength() == null)
+                throw new Exception("Invalid message length.");
+
+            if (payload != null) {
+                msgStream = new byte[DATA_MSG_LEN + DATA_MSG_TYPE + payload.length];
+
+                System.arraycopy(msg.messageClassObject.getMessageLength(), 0, msgStream, 0,
+                        msg.messageClassObject.getMessageLength().length);
+                System.arraycopy(type, 0, msgStream, DATA_MSG_LEN, DATA_MSG_TYPE);
+                System.arraycopy(payload, 0, msgStream, DATA_MSG_LEN + DATA_MSG_TYPE, payload.length);
+
+
+            } else {
+                msgStream = new byte[DATA_MSG_LEN + DATA_MSG_TYPE];
+
+                System.arraycopy(msg.messageClassObject.getMessageLength(), 0, msgStream, 0, msg.messageClassObject.getMessageLength().length);
+                System.arraycopy(type, 0, msgStream, DATA_MSG_LEN, DATA_MSG_TYPE);
+
+            }
+
+        }
+        catch (Exception e)
+        {
+            Util.PrintLog(e.toString());
+            msgStream = null;
+        }
+
+        return msgStream;
+    }
+
 
     public Message wrapToClassObject(int type, byte[] payload){
         try {
@@ -50,3 +97,4 @@ public class MessageWrapper {
         }
     }
 }
+
