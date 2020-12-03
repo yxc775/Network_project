@@ -26,45 +26,9 @@ public class MessageWrapper {
     }
 
 
-    public static byte[] encode(MessageWrapper msg)
+    public byte[] encode()
     {
-        byte[] msgStream = null;
-        try
-        {
-            if (msg.messageClassObject.getMessageLength().length > DATA_MSG_LEN)
-                throw new Exception("Invalid message length.");
-            else if (type < 0 || type > 7)
-                throw new Exception("Invalid message type.");
-            else if (type == null)
-                throw new Exception("Invalid message type.");
-            else if (msg.messageClassObject.getMessageLength() == null)
-                throw new Exception("Invalid message length.");
-
-            if (payload != null) {
-                msgStream = new byte[DATA_MSG_LEN + DATA_MSG_TYPE + payload.length];
-
-                System.arraycopy(msg.messageClassObject.getMessageLength(), 0, msgStream, 0,
-                        msg.messageClassObject.getMessageLength().length);
-                System.arraycopy(type, 0, msgStream, DATA_MSG_LEN, DATA_MSG_TYPE);
-                System.arraycopy(payload, 0, msgStream, DATA_MSG_LEN + DATA_MSG_TYPE, payload.length);
-
-
-            } else {
-                msgStream = new byte[DATA_MSG_LEN + DATA_MSG_TYPE];
-
-                System.arraycopy(msg.messageClassObject.getMessageLength(), 0, msgStream, 0, msg.messageClassObject.getMessageLength().length);
-                System.arraycopy(type, 0, msgStream, DATA_MSG_LEN, DATA_MSG_TYPE);
-
-            }
-
-        }
-        catch (Exception e)
-        {
-            Util.PrintLog(e.toString());
-            msgStream = null;
-        }
-
-        return msgStream;
+        return messageClassObject.encode();
     }
 
 

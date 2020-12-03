@@ -34,4 +34,9 @@ public class Request implements Message {
     public boolean hasPayload() {
         return true;
     }
+
+    @Override
+    public byte[] encode() {
+        return Util.encodeMessageWithPayload(this);
+    }
 }

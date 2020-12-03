@@ -1,5 +1,6 @@
 package Utility;
 import Logger.Logger;
+import MessageObjects.Message;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -27,6 +28,27 @@ public class Util {
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return sdf.format(cal.getTime());
+    }
+
+    public static byte[] encodeMessageWithPayload(Message x){
+        byte[] msg = new byte[x.getMessageLength().length + 1 + x.getPayload().length];
+        byte[] type = new byte[1];
+        type[0] = x.getMessageType();
+        System.arraycopy(x.getMessageLength(), 0, msg, 0,
+                x.getMessageLength().length);
+        System.arraycopy(type, 0, msg, x.getMessageLength().length, 1);
+        System.arraycopy(x.getPayload(), 0, msg, x.getMessageLength().length + 1, x.getPayload().length);
+
+        return msg;
+    }
+
+    public static byte[] encodeMessageWithOutPayload(Message x){
+        byte[] msg = new byte[x.getMessageLength().length + 1];
+        byte[] type = new byte[1];
+        type[0] = x.getMessageType();
+        System.arraycopy(x.getMessageLength(), 0, msg, 0, x.getMessageLength().length);
+        System.arraycopy(type, 0, msg, x.getMessageLength().length, 1);
+        return msg;
     }
 
     public static byte[] intToByteArray(int value)

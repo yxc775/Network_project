@@ -5,4 +5,5 @@ public interface Message {
     public byte getMessageType();
     public byte[] getPayload();
     public boolean hasPayload();
+    public byte[] encode();
 }

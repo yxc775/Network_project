@@ -29,4 +29,11 @@ public class Interested implements Message {
     public boolean hasPayload() {
         return false;
     }
+
+    @Override
+    public byte[] encode() {
+        return Util.encodeMessageWithOutPayload(this);
+    }
+
+
 }

@@ -4,11 +4,9 @@ package Peer;
 import Config.CommonAttributes;
 import Utility.PeerSpeedComparator;
 import Utility.Util;
+import MessageObjects.MessageWrapper;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.util.*;
 
@@ -17,7 +15,8 @@ public class PreferedPeer extends TimerTask {
     private int curpeerID;
     private peerProcess curProcess;
     public PreferedPeer(peerProcess curprocess){
-        curpeerID = curprocess.remotePeerInfo.peerId;
+        this.curProcess = curprocess;
+        this.curpeerID = curprocess.remotePeerInfo.peerId;
     }
     @Override
     public void run() {
@@ -124,18 +123,15 @@ public class PreferedPeer extends TimerTask {
     }
 
    private void SendUnchoke(Socket socket, int remotePeerID) {
-        //todo implement send unchoke
         Util.PrintLog(curpeerID + " is sending UNCHOKE message to remote Peer " + remotePeerID);
         MessageWrapper m = new MessageWrapper(1, null, remotePeerID);
-        byte[] msgByte = MessageWrapper.encode(m);
-        SendData(socket, msgByte);
+        SendData(socket, m.encode());
     }
     private void SendHave(Socket socket, int remotePeerID) {
-        //todo implement send have
-        byte[] encodedBitField = peerProcess.ownBitField.encode();
+        byte[] encodedBitField = curProcess.owned.getBitFieldByteArray();
         Util.PrintLog(curpeerID + " sending HAVE message to Peer " + remotePeerID);
         MessageWrapper m = new MessageWrapper(4, encodedBitField, remotePeerID);
-        SendData(socket,MessageWrapper.encode(m));
+        SendData(socket,m.encode());
     }
 
     private static int SendData(Socket socket, byte[] encodedBitField) {
