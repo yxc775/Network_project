@@ -94,7 +94,7 @@ public class PreferedPeer extends TimerTask {
         }
     }
 
-    public void reReadPeerInfo(){
+    public static void reReadPeerInfo(){
         try{
             String line;
             BufferedReader input = new BufferedReader(new FileReader("PeerInfo.cfg"));

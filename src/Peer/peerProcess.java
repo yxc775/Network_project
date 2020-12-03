@@ -134,7 +134,7 @@ public class peerProcess implements Runnable {
 
     public void startUnchokedPeersTimer(){
         unchokedPeerTimer = new Timer();
-        unchokedPeerTimer.schedule(new UnchokePeer(),
+        unchokedPeerTimer.schedule(new UnchokePeer(this),
                 CommonAttributes.optimisticUnchokeInterval* 1000,
                 CommonAttributes.optimisticUnchokeInterval * 1000
         );
