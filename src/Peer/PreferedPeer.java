@@ -123,10 +123,29 @@ public class PreferedPeer extends TimerTask {
 
     }
 
-    private void SendUnchoke(Socket socket, int remotePeerID) {
+   private void SendUnchoke(Socket socket, int remotePeerID) {
         //todo implement send unchoke
+        Util.PrintLog(curpeerID + " is sending UNCHOKE message to remote Peer " + remotePeerID);
+        MessageWrapper m = new MessageWrapper(1, null, remotePeerID);
+        byte[] msgByte = MessageWrapper.encode(m);
+        SendData(socket, msgByte);
     }
     private void SendHave(Socket socket, int remotePeerID) {
         //todo implement send have
+        byte[] encodedBitField = peerProcess.ownBitField.encode();
+        Util.PrintLog(curpeerID + " sending HAVE message to Peer " + remotePeerID);
+        MessageWrapper m = new MessageWrapper(4, encodedBitField, remotePeerID);
+        SendData(socket,MessageWrapper.encode(m));
+    }
+
+    private static int SendData(Socket socket, byte[] encodedBitField) {
+        try {
+            OutputStream output = socket.getOutputStream();
+            output.write(encodedBitField);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return 0;
+        }
+        return 1;
     }
 }
