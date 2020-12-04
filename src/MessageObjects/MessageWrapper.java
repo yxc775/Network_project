@@ -3,7 +3,7 @@ package MessageObjects;
 import Utility.Util;
 
 public class MessageWrapper {
-    public Message messageClassObject;
+    private Message messageClassObject;
     public final static int CHOKE_TYPE = 0;
     public final static int UNCHOKE_TYPE = 1;
     public final static int INTERESTED_TYPE = 2;
@@ -13,8 +13,6 @@ public class MessageWrapper {
     public final static int REQUEST_TYPE = 6;
     public final static int PIECE_TYPE = 7;
 
-    public static final int DATA_MSG_LEN = 4;
-    public static final int DATA_MSG_TYPE = 1;
     public static byte[] payload;
     public int fromSenderPeer;
     public static Integer type;
@@ -25,6 +23,13 @@ public class MessageWrapper {
         this.fromSenderPeer = fromSenderPeer;
     }
 
+    public Message getMessage(){
+        return messageClassObject;
+    }
+
+    public int getRemoteSenderID(){
+        return fromSenderPeer;
+    }
 
     public byte[] encode()
     {

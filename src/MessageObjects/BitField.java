@@ -14,7 +14,6 @@ public class BitField implements Message {
         this.payload = payload;
     }
 
-
     @Override
     public byte[] getMessageLength() {
         return messageLength;

@@ -6,13 +6,14 @@ import Utility.Util;
 public class Piece implements Message {
     private byte[] byteIndex;
     private byte[] filePart;
-    public int INDEX_LENGTH = 4;
+    public static int INDEX_LENGTH = 4;
     public int index;
     public boolean haveit = false;
     public String ownder;
     public byte messageType;
     public byte[] messageLength;
     public byte[] payload;
+    public int fromPeer;
 
     public Piece(){
         filePart = new byte[CommonAttributes.piecesize];
@@ -31,6 +32,18 @@ public class Piece implements Message {
         index = Util.convertByteToInt(byteIndex);
         filePart = new byte[messagePayload.length - INDEX_LENGTH];
         System.arraycopy(messagePayload, INDEX_LENGTH, filePart, 0, messagePayload.length-INDEX_LENGTH);
+    }
+
+    public byte[] getFilePart(){
+        return this.filePart;
+    }
+
+    public void setHaveIt(){
+        this.haveit = true;
+    }
+
+    public void setFromPeer(int peerId){
+        this.fromPeer = peerId;
     }
 
     @Override

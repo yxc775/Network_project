@@ -2,9 +2,10 @@ package Peer;
 
 import Config.CommonAttributes;
 import Config.CommonInfoConfig;
-import FileManager.FilePiecesManager;
+import FileManager.FilePiecesState;
 import Logger.Logger;
 import MessageObjects.Message;
+import MessageObjects.Piece;
 import Utility.Util;
 
 import java.io.*;
@@ -21,7 +22,7 @@ public class peerProcess implements Runnable {
     public ServerSocket listeningSocket = null; //this will used for listening socket
     public Thread listeningThread = null;
     public RemotePeerInfo remotePeerInfo;
-    public FilePiecesManager owned = null;
+    public FilePiecesState owned = null;
     public static volatile Timer preferedPeerTimer;
     public static volatile Timer unchokedPeerTimer;
 
@@ -35,7 +36,7 @@ public class peerProcess implements Runnable {
 
 
     //this will update all peerinfo from peerinfo.cfg to Hashtable, and unchocked peer
-    public void readPeerInfo() {
+    public static void readPeerInfo() {
         String line;
         try{
             BufferedReader input = new BufferedReader(new FileReader("PeerInfo.cfg"));
@@ -58,6 +59,31 @@ public class peerProcess implements Runnable {
         }
         catch(IOException e){
             e.printStackTrace();
+        }
+    }
+
+    public static void updatePeerInfo()
+    {
+        try
+        {
+            String st;
+            BufferedReader in = new BufferedReader(new FileReader("PeerInfo.cfg"));
+            while ((st = in.readLine()) != null)
+            {
+                String[]args = st.trim().split("\\s+");
+                String peerID = args[0];
+                int isCompleted = Integer.parseInt(args[3]);
+                if(isCompleted == 1)
+                {
+                    ProcessManager.AllRemotePeerInfo.get(peerID).isCompleted = true;
+                    ProcessManager.AllRemotePeerInfo.get(peerID).isInterested = false;
+                    ProcessManager.AllRemotePeerInfo.get(peerID).isChoked = false;
+                }
+            }
+            in.close();
+        }
+        catch (Exception e) {
+            Util.PrintLog(e.toString());
         }
     }
 
@@ -158,7 +184,7 @@ public class peerProcess implements Runnable {
 
             CommonInfoConfig.readCommonInfo("Common.cfg");
 
-            process.readPeerInfo();
+            readPeerInfo();
             process.remotePeerInfo = ProcessManager.AllRemotePeerInfo.get(args[0]);
 
             process.createPreferPeer();
@@ -168,10 +194,10 @@ public class peerProcess implements Runnable {
             }
 
             //initialize the Bit field
-            process.owned = new FilePiecesManager();
+            process.owned = new FilePiecesState();
             process.owned.checkOwndedBitField(String.valueOf(process.getProcessID()), isFirst);
 
-            ProcessManager.messageManager = new Thread(new MessageManager());
+            ProcessManager.messageManager = new Thread(new MessageManager(process));
             ProcessManager.messageManager.start();
 
             //If it is the first peer, first peer is assumed to have the whole file.
@@ -268,37 +294,91 @@ public class peerProcess implements Runnable {
         return remotePeerInfo.peerAddress;
     }
 
-    //various function we will use for sending data
-    private void SendChoke() {
+    public synchronized void updateFileBitPart(int peerId, Piece piece) {
+        try
+        {
+            if (this.owned.filePiecesList[piece.index].haveit) {
+                Util.PrintLog(peerId + " Piece already received!!");
+            }
+            else
+            {
+                String fileName = CommonAttributes.filename;
+                File file = new File(String.valueOf(this.remotePeerInfo.peerId), fileName);
+                int off = piece.index * CommonAttributes.piecesize;
+                RandomAccessFile rf = new RandomAccessFile(file, "rw");
+                byte[] filewrite = piece.getFilePart();
+
+                rf.seek(off);
+                rf.write(filewrite);
+
+                this.owned.filePiecesList[piece.index].setHaveIt();
+                this.owned.filePiecesList[piece.index].setFromPeer(peerId);
+                rf.close();
+
+               Util.PrintLog(this.remotePeerInfo.peerId
+                        + " has downloaded the PIECE " + piece.index
+                        + " from Peer " + peerId
+                        + ". Now the number of pieces it has is "
+                        + this.owned.countHavedPieces());
+
+                if (this.owned.hasALLPieces()) {
+                    ProcessManager.AllRemotePeerInfo.get(this.remotePeerInfo.peerId).isInterested = false;
+                    ProcessManager.AllRemotePeerInfo.get(this.remotePeerInfo.peerId).isCompleted = true;
+                    ProcessManager.AllRemotePeerInfo.get(this.remotePeerInfo.peerId).isChoked = false;
+                    updatePeerInfoCgFile();
+
+                    Util.PrintLog(this.remotePeerInfo.peerId + " has downloaded the complete file.");
+                }
+            }
+
+        } catch (Exception e) {
+            Util.PrintLog(this.remotePeerInfo.peerId
+                    + " EROR in updating bitfield " + e.getMessage());
+        }
 
     }
 
-    private void SendUnchoke() {
+    // Updates PeerInfo.cfg
+    public void updatePeerInfoCgFile()
+    {
+        BufferedWriter output = null;
+        BufferedReader input = null;
 
+        try
+        {
+            input= new BufferedReader(new FileReader("PeerInfo.cfg"));
+
+            String line;
+            String hasFullFile = "1";
+            StringBuffer buffer = new StringBuffer();
+            line = input.readLine();
+            while(line != null)
+            {
+                String[] tokens = line.trim().split("\\s+");
+                if(Integer.valueOf(tokens[0]) == this.remotePeerInfo.peerId)
+                {
+                    buffer.append(tokens[0] + " " + tokens[1] + " " + tokens[2] + " " + hasFullFile);
+                }
+                else
+                {
+                    buffer.append(line);
+                }
+                buffer.append("\n");
+            }
+
+            input.close();
+
+            output= new BufferedWriter(new FileWriter("PeerInfo.cfg"));
+            output.write(buffer.toString());
+
+            output.close();
+        }
+        catch (Exception e)
+        {
+            Util.PrintLog(this.remotePeerInfo.peerId + " Error in updating the PeerInfo.cfg " +  e.getMessage());
+        }
     }
 
-    private void SendInterested() {
-
-    }
-
-    private void SendUnInterested() {
-
-    }
-
-    private void SendHave() {
-
-    }
-
-    private void SendBitfield() {
-
-    }
-
-    private void SendRequest() {
-
-    }
-
-    private void SendPiece() {
 
 
-    }
 }

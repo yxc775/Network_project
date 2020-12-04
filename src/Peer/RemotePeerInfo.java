@@ -1,5 +1,10 @@
 package Peer;
 
+import FileManager.FilePiecesState;
+import MessageObjects.BitField;
+
+import java.util.Date;
+
 //this is the infomation for different peer, other peer using this to connect with other peer
 public class RemotePeerInfo implements Comparable<RemotePeerInfo>{
 	public double downloadSpeed = 0;
@@ -13,7 +18,10 @@ public class RemotePeerInfo implements Comparable<RemotePeerInfo>{
 	public Boolean isHandShaked = false;
 	public Boolean isInterested = true;
 	public Boolean isPrefered = false;
+	public FilePiecesState filesState;
 	public int peerState = -1;
+	public Date timeStart;
+	public Date timeExit;
 
 
 	public RemotePeerInfo(int pId, String pAddress, int pPort, int index) {
@@ -21,6 +29,7 @@ public class RemotePeerInfo implements Comparable<RemotePeerInfo>{
 		this.peerAddress = pAddress;
 		this.port = pPort;
 		this.index = index;
+		this.filesState = new FilePiecesState();
 	}
 
 	public int  getPeerId(){
