@@ -63,17 +63,15 @@ public class UnchokePeer extends TimerTask {
             Collections.shuffle(temp);
             RemotePeerInfo peer = temp.firstElement();
 
+            ProcessManager.unchokedPeer.put(peer.peerId, ProcessManager.AllRemotePeerInfo.get(peer.peerId));
             //todo printlog is not finished yet
             Util.PrintLog(peerID + " has the optimistically unchoked neighbor " + peer.peerId);
 
             if( ProcessManager.AllRemotePeerInfo.get(peer.peerId).isChoked )
             {
                 ProcessManager.AllRemotePeerInfo.get(peer.peerId).isChoked = false;
-                //todo send unchoke
                 SendUnchoke(ProcessManager.despeerIdToSocket.get(peer.peerId),peer.peerId);
-                //todo send have
                 SendHave(ProcessManager.despeerIdToSocket.get(peer.peerId),peer.peerId);
-                //todo discuss what state is
                 ProcessManager.AllRemotePeerInfo.get(peer.peerId).peerState = 3;
             }
         }
