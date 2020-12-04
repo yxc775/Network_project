@@ -18,22 +18,13 @@ import java.util.Map;
 import java.util.Timer;
 
 //this is the main peerProcess, take role as sender. send message to other process
-public class peerProcess implements Runnable {
+public class peerProcess{
     public ServerSocket listeningSocket = null; //this will used for listening socket
     public Thread listeningThread = null;
     public RemotePeerInfo remotePeerInfo;
     public FilePiecesState owned = null;
     public static volatile Timer preferedPeerTimer;
     public static volatile Timer unchokedPeerTimer;
-
-    public peerProcess() {
-    }
-
-    //this will goes over the current data and decide what kind of message we will do next steps, which will using other functions
-    public void run() {
-
-    }
-
 
     //this will update all peerinfo from peerinfo.cfg to Hashtable, and unchocked peer
     public static void readPeerInfo() {
