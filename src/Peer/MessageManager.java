@@ -68,7 +68,6 @@ public class MessageManager implements  Runnable {
                 }
             }
             else{
-                System.out.println("current message processor state is " + state);
                 switch(state){
                     case 2:
                         if(type == MessageWrapper.BITFIELD_TYPE){

@@ -17,17 +17,18 @@ public class FilePiecesState {
 
     public static FilePiecesState convertBitFieldToFileInfo(byte[] payload) {
         FilePiecesState toReturn = new FilePiecesState();
-        for (int i = 0; i < payload.length; i++) {
+        for(int i = 0 ; i < payload.length; i ++)
+        {
             int count = 7;
-            while (count >= 0) {
-                //Bit shifter to better convert byte info list to bit representation list
+            while(count >=0)
+            {
                 int test = 1 << count;
-                int filePieceIndex = i * 8 + (8 - count - 1);
-                if (filePieceIndex < toReturn.size) {
-                    if ((payload[i] & (test)) != 0)
-                        toReturn.filePiecesList[filePieceIndex].haveit = true;
+                if(i * 8 + (8-count-1) < toReturn.size)
+                {
+                    if((payload[i] & (test)) != 0)
+                        toReturn.filePiecesList[i * 8 + (8-count-1)].haveit = true;
                     else
-                        toReturn.filePiecesList[filePieceIndex].haveit = false;
+                        toReturn.filePiecesList[i * 8 + (8-count-1)].haveit = false;
                 }
                 count--;
             }
@@ -64,36 +65,36 @@ public class FilePiecesState {
 
     public byte[] getBitFieldByteArray() {
         int s = this.size / 8;
-        //add one extra space to handle extra file piece in residual of 8
-        if (size % 8 != 0) {
+        if (size % 8 != 0)
             s = s + 1;
-        }
-        byte[] bitfield = new byte[s];
-        int boolList = 0;
-        int i;
-        int j = 0;
-        //loop through all available piece and output the correlated BitField
+        byte[] iP = new byte[s];
+        int tempInt = 0;
+        int count = 0;
+        int Cnt;
+        for (Cnt = 1; Cnt <= this.size; Cnt++)
+        {
+            boolean haveit = this.filePiecesList[Cnt-1].haveit;
+            tempInt = tempInt << 1;
+            if (haveit)
+            {
+                tempInt = tempInt + 1;
+            } else
+                tempInt = tempInt + 0;
 
-        for (i = 1; i <= this.size; i++) {
-            boolean haveThePiece = this.filePiecesList[i - 1].haveit;
-            //need to use the boollist to mark whether the piece is present from high to low bit
-            boolList = (boolList << 1) + (haveThePiece ? 1 : 0);
-
-            if (i + 1 % 8 == 0) {
-                bitfield[j] = (byte) boolList;
-                j++;
-                //reset the boolist to 0 since we just fill a byte unit
-                boolList = 0;
+            if (Cnt % 8 == 0 && Cnt!=0) {
+                iP[count] = (byte) tempInt;
+                count++;
+                tempInt = 0;
             }
-        }
 
-        //Some file piece bit field may be ignored if only handling the 8 times entity.
-        if ((i - 1) % 8 != 0) {
-            int tempShift = ((size) - (size / 8) * 8);
-            boolList = boolList << (8 - tempShift);
-            bitfield[j] = (byte) boolList;
         }
-        return bitfield;
+        if ((Cnt-1) % 8 != 0)
+        {
+            int tempShift = ((size) - (size / 8) * 8);
+            tempInt = tempInt << (8 - tempShift);
+            iP[count] = (byte) tempInt;
+        }
+        return iP;
     }
 
 
