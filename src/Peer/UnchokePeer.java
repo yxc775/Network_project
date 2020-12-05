@@ -64,7 +64,6 @@ public class UnchokePeer extends TimerTask {
             RemotePeerInfo peer = temp.firstElement();
 
             ProcessManager.unchokedPeer.put(peer.peerId, ProcessManager.AllRemotePeerInfo.get(peer.peerId));
-            //todo printlog is not finished yet
             Util.PrintLog(peerID + " has the optimistically unchoked neighbor " + peer.peerId);
 
             if( ProcessManager.AllRemotePeerInfo.get(peer.peerId).isChoked )

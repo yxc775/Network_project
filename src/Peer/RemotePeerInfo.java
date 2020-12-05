@@ -24,11 +24,12 @@ public class RemotePeerInfo implements Comparable<RemotePeerInfo>{
 	public Date timeExit;
 
 
-	public RemotePeerInfo(int pId, String pAddress, int pPort, int index) {
+	public RemotePeerInfo(int pId, String pAddress, int pPort, boolean hasFile, int index) {
 		this.peerId = pId;
 		this.peerAddress = pAddress;
 		this.port = pPort;
 		this.index = index;
+		this.hasFile = hasFile;
 		this.filesState = new FilePiecesState();
 	}
 

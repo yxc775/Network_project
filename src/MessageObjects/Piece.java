@@ -9,7 +9,7 @@ public class Piece implements Message {
     public static int INDEX_LENGTH = 4;
     public int index;
     public boolean haveit = false;
-    public String ownder;
+    public String owner;
     public byte messageType;
     public byte[] messageLength;
     public byte[] payload;
@@ -19,7 +19,7 @@ public class Piece implements Message {
         filePart = new byte[CommonAttributes.piecesize];
         index = -1;
         haveit = false;
-        ownder = null;
+        owner = null;
     }
 
     public Piece(byte[] messagePayload)

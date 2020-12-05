@@ -17,7 +17,6 @@ public class MessageManager implements  Runnable {
     private boolean running = true;
 
     public peerProcess curprocess;
-    RandomAccessFile rf;
 
     public MessageManager(peerProcess process)
     {
@@ -47,6 +46,7 @@ public class MessageManager implements  Runnable {
                 catch(Exception e){
                     e.printStackTrace();
                 }
+                messageWrapper = ProcessManager.removeFromMsgQueue();
             }
 
             message = messageWrapper.getMessage();

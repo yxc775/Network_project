@@ -2,11 +2,6 @@ package FileManager;
 
 import Config.CommonAttributes;
 import MessageObjects.Piece;
-import Peer.peerProcess;
-import Utility.Util;
-
-import java.io.File;
-import java.io.RandomAccessFile;
 
 public class FilePiecesState {
     public Piece[] filePiecesList;
@@ -106,12 +101,12 @@ public class FilePiecesState {
         if (hasFile) {
             for (Piece x : filePiecesList) {
                 x.haveit = true;
-                x.ownder = pid;
+                x.owner = pid;
             }
         } else {
             for (Piece x : filePiecesList) {
                 x.haveit = false;
-                x.ownder = pid;
+                x.owner = pid;
             }
         }
     }

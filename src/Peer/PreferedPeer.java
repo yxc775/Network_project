@@ -49,7 +49,6 @@ public class PreferedPeer extends TimerTask {
                 ProcessManager.PreferedPeer.clear();
             }
             List<RemotePeerInfo> pickList = new ArrayList<>(ProcessManager.AllRemotePeerInfo.values());
-            //todo need to finish Peer streaming speed Comparator
             Collections.sort(pickList, new PeerSpeedComparator());
             int count = 0;
             for(RemotePeerInfo i: pickList){

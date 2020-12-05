@@ -54,7 +54,6 @@ public class ProcessManager {
             return messageQueue.remove();
         }
         else{
-            System.out.println("Empty message queue! all message read");
             return null;
         }
     }

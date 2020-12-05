@@ -23,41 +23,45 @@ public class RemoteHandler implements Runnable{
     private int curPeerid;
     private int desPeerid;
     //
-    public RemoteHandler(peerProcess curProcess,int portnum,int curPeerID, boolean isSender, String address){
+    public RemoteHandler(peerProcess curProcess, Socket remoteSocket, boolean isSender, int curPeerid){
         this.curProcess = curProcess;
+        this.socket = remoteSocket;
         this.isSender = isSender;
-        this.curPeerid = curPeerID;
-        if(isSender){
+        this.curPeerid = curPeerid;
+        try{
+            input = socket.getInputStream();
+            output = socket.getOutputStream();
+        }
+        catch (IOException e){
+            Util.PrintLog(this.curPeerid + " get error during making connection" + e.getMessage());
+        }
+    }
+
+    public RemoteHandler(peerProcess curProcess,int portnum, boolean isSender, String address){
+        this.curProcess = curProcess;
+        this.curPeerid = curProcess.remotePeerInfo.peerId;
+        this.isSender = isSender;
             try{
-                socket = new Socket(address,portnum);
+                this.socket = new Socket(address,portnum);
             }
             catch(IOException e){
                 e.printStackTrace();
                 System.exit(0);
             }
-        }
-        else{
-            if(socket == null){
-                Util.PrintLog("trying to receiving passive connection without assigned socket");
-                System.exit(0);
-            }
+
             try{
                 input = socket.getInputStream();
                 output = socket.getOutputStream();
             }
             catch(Exception ex){
-                Util.PrintLog(this.curPeerid + " error: " + ex.getMessage());
+                Util.PrintLog(curProcess.remotePeerInfo.peerId + " error: " + ex.getMessage());
                 System.exit(0);
             }
-        }
-
-
-
     }
 
     public boolean sendHandShake(){
         try{
-            output.write(new HandShake(HandShake.correctHeader,HandShake.correctZerobits,curPeerid).encodeMessage());
+            output.write(new HandShake(HandShake.correctHeader,curPeerid).encodeMessage());
             return true;
         }
         catch(IOException e){
@@ -91,6 +95,7 @@ public class RemoteHandler implements Runnable{
 
                 // Sending BitField...
                 BitField d = new BitField(curProcess.owned.getBitFieldByteArray());
+
                 byte[] bitfieldObject = d.encode();
                 output.write(bitfieldObject);
                 ProcessManager.AllRemotePeerInfo.get(desPeerid).peerState = 8;
@@ -130,19 +135,21 @@ public class RemoteHandler implements Runnable{
                 byte[] messageType = new byte[1];
                 System.arraycopy(messageHeader, 0, messageLength, 0, messageLength.length);
                 System.arraycopy(messageHeader, messageLength.length, messageType, 0, messageType.length);
-                int type = Util.convertByteToInt(messageType);
+                int type = messageType[0];
                 if(hasPayLoad(type)){
                     int bytesRead = 0;
                     int readStatus;
                     byte []dataPayload = new byte[Util.convertByteToInt(messageLength)-1];
                     while(bytesRead< Util.convertByteToInt(messageLength)-1){
                         readStatus = input.read(dataPayload, bytesRead, Util.convertByteToInt(messageLength)-1-bytesRead);
-                        if(readStatus == -1)
+                        if(readStatus == -1) {
                             //finished reading
                             return;
+                        }
                         bytesRead += readStatus;
                     }
 
+                    System.out.println("finsihed reading");
                     ProcessManager.addToMessageQueuelist(new MessageWrapper(type,dataPayload,this.desPeerid));
                 }
                 else{

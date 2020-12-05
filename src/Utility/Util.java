@@ -22,7 +22,9 @@ public class Util {
 
     //this will call log generator to create loc based on input string
     public static void PrintLog(String message) {
-        Logger.writeLog(getTime() + ": Peer " + message);
+        String content = getTime() + ": Peer " + message;
+        Logger.writeLog(content);
+        System.out.println(content);
     }
 
     public static String getTime(){
