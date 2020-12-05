@@ -55,7 +55,7 @@ public class PreferedPeer extends TimerTask {
                 if(count > CommonAttributes.numberOfPreferedN - 1){
                     break;
                 }
-                if(i.isHandShaked && i.peerId == curpeerID && ProcessManager.AllRemotePeerInfo.get(i.peerId).isCompleted){
+                if(i.isHandShaked && i.peerId != curpeerID && !ProcessManager.AllRemotePeerInfo.get(i.peerId).isCompleted){
                     ProcessManager.AllRemotePeerInfo.get(i.peerId).isPrefered = true;
                     ProcessManager.PreferedPeer.put(i.peerId, ProcessManager.AllRemotePeerInfo.get(i.peerId));
                     count++;

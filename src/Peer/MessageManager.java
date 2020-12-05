@@ -9,7 +9,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.lang.reflect.Array;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 
@@ -66,6 +68,7 @@ public class MessageManager implements  Runnable {
                 }
             }
             else{
+                System.out.println("current message processor state is " + state);
                 switch(state){
                     case 2:
                         if(type == MessageWrapper.BITFIELD_TYPE){
@@ -151,7 +154,9 @@ public class MessageManager implements  Runnable {
                             curprocess.updateFileBitPart(despeerId,piece);
 
                             int togetPiecePart = curprocess.owned.findFirstFileListMisMatch(ProcessManager.AllRemotePeerInfo.get(despeerId).filesState);
+
                             if(togetPiecePart != -1){
+                                Util.PrintLog(curprocess.remotePeerInfo.peerId + " Requesting piece " +togetPiecePart +" from peer " +despeerId);
                                 sendRequest(ProcessManager.despeerIdToSocket.get(despeerId),togetPiecePart);
                                 ProcessManager.AllRemotePeerInfo.get(despeerId).peerState = 11;
                                 ProcessManager.AllRemotePeerInfo.get(despeerId).timeStart = new Date();
@@ -160,13 +165,14 @@ public class MessageManager implements  Runnable {
                                 ProcessManager.AllRemotePeerInfo.get(despeerId).peerState = 13;
                             }
 
+
                             peerProcess.updatePeerInfo();
                             Enumeration<Integer> keys = ProcessManager.AllRemotePeerInfo.keys();
                             while(keys.hasMoreElements()){
                                 int key = keys.nextElement();
                                 RemotePeerInfo info = ProcessManager.AllRemotePeerInfo.get(key);
                                 if(key != curprocess.remotePeerInfo.peerId){
-                                    if(info.isCompleted && !info.isChoked && info.isHandShaked){
+                                    if(!info.isCompleted && !info.isChoked && info.isHandShaked){
                                         sendHave(ProcessManager.despeerIdToSocket.get(key),key);
                                         ProcessManager.AllRemotePeerInfo.get(key).peerState = 3;
                                     }

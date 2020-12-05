@@ -143,13 +143,11 @@ public class RemoteHandler implements Runnable{
                     while(bytesRead< Util.convertByteToInt(messageLength)-1){
                         readStatus = input.read(dataPayload, bytesRead, Util.convertByteToInt(messageLength)-1-bytesRead);
                         if(readStatus == -1) {
-                            //finished reading
                             return;
                         }
                         bytesRead += readStatus;
                     }
 
-                    System.out.println("finsihed reading");
                     ProcessManager.addToMessageQueuelist(new MessageWrapper(type,dataPayload,this.desPeerid));
                 }
                 else{

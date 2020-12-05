@@ -4,13 +4,11 @@ import Config.CommonAttributes;
 import Config.CommonInfoConfig;
 import FileManager.FilePiecesState;
 import Logger.Logger;
-import MessageObjects.Message;
 import MessageObjects.Piece;
 import Utility.Util;
 
 import java.io.*;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -66,7 +64,7 @@ public class peerProcess{
             while ((st = in.readLine()) != null)
             {
                 String[]args = st.trim().split("\\s+");
-                String peerID = args[0];
+                int peerID = Integer.valueOf(args[0]);
                 int isCompleted = Integer.parseInt(args[3]);
                 if(isCompleted == 1)
                 {
@@ -78,7 +76,7 @@ public class peerProcess{
             in.close();
         }
         catch (Exception e) {
-            Util.PrintLog(e.toString());
+            Util.PrintLog("error when updating peer info " + e.toString());
         }
     }
 
@@ -119,7 +117,7 @@ public class peerProcess{
     public void startPreferedPeersTimer(){
         preferedPeerTimer = new Timer();
         preferedPeerTimer.schedule(new PreferedPeer(this),
-                CommonAttributes.unChokeInterval * 1000,
+                CommonAttributes.unChokeInterval * 1000 * 0,
                 CommonAttributes.unChokeInterval * 1000
         );
     }
@@ -127,7 +125,7 @@ public class peerProcess{
     public void startUnchokedPeersTimer(){
         unchokedPeerTimer = new Timer();
         unchokedPeerTimer.schedule(new UnchokePeer(this),
-                CommonAttributes.optimisticUnchokeInterval* 1000,
+                CommonAttributes.optimisticUnchokeInterval* 1000 * 0,
                 CommonAttributes.optimisticUnchokeInterval * 1000
         );
     }

@@ -24,7 +24,7 @@ public class HandShake {
             this.zeroBits = "0000000000".getBytes(StandardCharsets.UTF_8);
             checkIntegrity();
         } catch (Exception e) {
-            Util.PrintLog(e.toString());
+            Util.PrintLog("error happen during handshake construction " + e.toString());
         }
     }
 
@@ -48,7 +48,7 @@ public class HandShake {
             handshakeMessage = new HandShake(Util.convertByteToString(header),Util.convertByteToInt(peerID));
             return handshakeMessage;
         } catch (Exception e) {
-            Util.PrintLog(e.toString());
+            Util.PrintLog("Error happen during decoding " + e.toString());
             return null;
         }
     }
