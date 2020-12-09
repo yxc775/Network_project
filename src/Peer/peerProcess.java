@@ -311,9 +311,10 @@ public class peerProcess{
                     ProcessManager.AllRemotePeerInfo.get(this.remotePeerInfo.peerId).isInterested = false;
                     ProcessManager.AllRemotePeerInfo.get(this.remotePeerInfo.peerId).isCompleted = true;
                     ProcessManager.AllRemotePeerInfo.get(this.remotePeerInfo.peerId).isChoked = false;
-                    updatePeerInfoCgFile();
+
 
                     Util.PrintLog(this.remotePeerInfo.peerId + " has downloaded the complete file.");
+                    updatePeerInfoCgFile();
                 }
             }
 
@@ -348,8 +349,10 @@ public class peerProcess{
                 else
                 {
                     buffer.append(line);
+
                 }
                 buffer.append("\n");
+                line = input.readLine();
             }
 
             input.close();
